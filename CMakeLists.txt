@@ -11,7 +11,7 @@ add_library(vernier MODULE lib/plugin.cpp)
 #compilation targets
 target_include_directories(vernier SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 #split the string
-separate_arguments(LLVM_DEFS NATIVE_COMMAND"${LLVM_DEFINITIONS}")
+separate_arguments(LLVM_DEFS UNIX_COMMAND "${LLVM_DEFINITIONS}")
 target_compile_definitions(vernier PRIVATE ${LLVM_DEFS})
 
 #rtti fallback
