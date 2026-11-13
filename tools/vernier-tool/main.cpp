@@ -1,5 +1,6 @@
 #include "ablate.h"
 #include "compare.h"
+#include "report.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -71,8 +72,16 @@ int main(int argc, char **argv) {
   }
 
   if (SubCommand == "report") {
-    errs() << "Vernier: 'report' subcommand will run in Phase 8\n";
-    return 0;
+    std::string TargetJson = JsonFile;
+    if (TargetJson.empty() && !PositionalFiles.empty())
+      TargetJson = PositionalFiles[0];
+    if (TargetJson.empty()) {
+      errs() << "Error: 'report' requires a JSON file.\n"
+             << "Usage: vernier-tool report <file.vernier.json> [--out report.txt]\n"
+             << "   or: vernier-tool report --json <file.vernier.json> [--out report.txt]\n";
+      return 1;
+    }
+    return vernier::runReport(TargetJson, OutFile);
   }
 
   errs() << "Unknown subcommand: " << SubCommand << "\n";
