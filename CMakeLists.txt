@@ -72,6 +72,7 @@ set_target_properties(vernier PROPERTIES PREFIX "")
 add_executable(vernier-tool
   tools/vernier-tool/main.cpp
   tools/vernier-tool/ablate.cpp
+  tools/vernier-tool/compare.cpp
 )
 
 target_include_directories(vernier-tool SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
