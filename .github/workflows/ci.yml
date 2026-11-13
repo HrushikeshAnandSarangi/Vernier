@@ -18,6 +18,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y llvm-18 llvm-18-dev llvm-18-tools clang-18 ninja-build cmake
+          echo "/usr/lib/llvm-18/bin" >> $GITHUB_PATH
 
       - name: Configure CMake
         run: |

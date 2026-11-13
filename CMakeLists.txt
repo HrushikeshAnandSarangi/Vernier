@@ -132,9 +132,17 @@ add_test(NAME test_report COMMAND test_report)
 
 # Integration smoke test
 find_program(BASH_BIN bash)
+find_program(CLANG_BIN NAMES clang clang-18 clang-19 clang-20 HINTS ${LLVM_TOOLS_BINARY_DIR})
+find_program(OPT_BIN NAMES opt opt-18 opt-19 opt-20 HINTS ${LLVM_TOOLS_BINARY_DIR})
+
 if(BASH_BIN)
   add_test(NAME test_smoke
-    COMMAND ${BASH_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/test/smoke.sh $<TARGET_FILE:vernier> $<TARGET_FILE:vernier-tool> ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${BASH_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/test/smoke.sh
+            $<TARGET_FILE:vernier>
+            $<TARGET_FILE:vernier-tool>
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CLANG_BIN}
+            ${OPT_BIN}
   )
 endif()
 
