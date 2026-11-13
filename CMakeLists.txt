@@ -26,6 +26,8 @@ llvm_map_components_to_libnames(LLVM_LIBS
 
 # Shared plugin module for opt and clang
 add_library(vernier MODULE
+  lib/diff.cpp
+  lib/hash.cpp
   lib/json.cpp
   lib/plugin.cpp
   lib/session.cpp

@@ -1,8 +1,11 @@
 #include "Vernier/Session.h"
+#include "Vernier/Diff.h"
+#include "Vernier/Hash.h"
 #include "Vernier/JSON.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/FileSystem.h"
+#include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Process.h"
 #include "llvm/Support/raw_ostream.h"
@@ -94,6 +97,14 @@ std::string Session::getOutputPath() const {
   return "vernier_run.json";
 }
 
+void Session::setEmitDiffs(bool Enable) {
+  EmitDiffs.store(Enable);
+}
+
+bool Session::getEmitDiffs() const {
+  return EmitDiffs.load();
+}
+
 void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
   if (ResolvedInputFile.empty() && Unit.M) {
     std::string SourceFile = Unit.M->getSourceFileName();
@@ -109,6 +120,12 @@ void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
                          .count();
   int Depth = static_cast<int>(ThreadFrameStack.size());
 
+  std::string BeforeHash = computeIRHash(Unit);
+  std::string BeforeText;
+  if (EmitDiffs.load()) {
+    BeforeText = getIRText(Unit);
+  }
+
   PassFrame Frame;
   Frame.InvocationId = NextInvocationId.fetch_add(1);
   Frame.PassID = PassID.str();
@@ -117,14 +134,14 @@ void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
   Frame.StartPoint = Now;
   Frame.StartNs = StartNs;
   Frame.ChildDurationNs = 0;
+  Frame.BeforeHash = std::move(BeforeHash);
+  Frame.BeforeText = std::move(BeforeText);
 
   ThreadFrameStack.push_back(std::move(Frame));
 }
 
-void Session::exitPass(StringRef /*PassID*/, const IRUnit &/*Unit*/,
-                       bool AllPreserved, bool Changed,
-                       const std::string &BeforeHash,
-                       const std::string &AfterHash) {
+void Session::exitPass(StringRef /*PassID*/, const IRUnit &Unit,
+                       bool AllPreserved) {
   if (ThreadFrameStack.empty())
     return;
 
@@ -145,6 +162,21 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &/*Unit*/,
   if (!ThreadFrameStack.empty())
     ThreadFrameStack.back().ChildDurationNs += TotalNs;
 
+  std::string AfterHash = computeIRHash(Unit);
+  bool Changed = (!Frame.BeforeHash.empty() && !AfterHash.empty() &&
+                  Frame.BeforeHash != AfterHash);
+
+  std::string DiffId;
+  if (Changed && EmitDiffs.load()) {
+    std::string AfterText = getIRText(Unit);
+    std::string Diff = computeUnifiedDiff(Unit.Name, Frame.BeforeText, AfterText);
+    if (!Diff.empty()) {
+      DiffId = formatv("diff_{0}", Frame.InvocationId).str();
+      std::lock_guard<std::mutex> Lock(SinkMutex);
+      Run.Diffs[DiffId] = std::move(Diff);
+    }
+  }
+
   schema::InvocationRecord Rec;
   Rec.Id = Frame.InvocationId;
   Rec.PassID = Frame.PassID;
@@ -163,8 +195,9 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &/*Unit*/,
   Rec.Change.Changed = Changed;
   Rec.Change.AllPreserved = AllPreserved;
   Rec.Change.UnderReporting = (!AllPreserved && !Changed);
-  Rec.Change.BeforeHash = BeforeHash;
+  Rec.Change.BeforeHash = Frame.BeforeHash;
   Rec.Change.AfterHash = AfterHash;
+  Rec.DiffId = DiffId;
 
   {
     std::lock_guard<std::mutex> Lock(SinkMutex);

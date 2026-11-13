@@ -21,6 +21,7 @@ struct PassFrame {
   uint64_t StartNs = 0;
   uint64_t ChildDurationNs = 0;
   std::string BeforeHash;
+  std::string BeforeText;
 };
 
 class Session {
@@ -30,14 +31,15 @@ public:
   void initialize(const std::string &InputFile = "", const std::string &OutputFile = "");
 
   void enterPass(llvm::StringRef PassID, const IRUnit &Unit);
-  void exitPass(llvm::StringRef PassID, const IRUnit &Unit, bool AllPreserved,
-                bool Changed = false, const std::string &BeforeHash = "",
-                const std::string &AfterHash = "");
+  void exitPass(llvm::StringRef PassID, const IRUnit &Unit, bool AllPreserved);
   void recordSkippedPass(llvm::StringRef PassID, const IRUnit &Unit);
   void recordInvalidatedPass(llvm::StringRef PassID, bool AllPreserved);
 
   void setOutputPath(const std::string &Path);
   std::string getOutputPath() const;
+
+  void setEmitDiffs(bool Enable);
+  bool getEmitDiffs() const;
 
   void flush();
 
@@ -56,6 +58,7 @@ private:
   std::string CustomOutputPath;
   std::string ResolvedInputFile;
   std::string ResolvedOutputFile;
+  std::atomic<bool> EmitDiffs{false};
 
   std::mutex SinkMutex;
   schema::SessionRun Run;
