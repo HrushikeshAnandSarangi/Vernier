@@ -2,6 +2,7 @@
 #include "Vernier/Diff.h"
 #include "Vernier/Hash.h"
 #include "Vernier/JSON.h"
+#include "Vernier/Store.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/FileSystem.h"
@@ -68,6 +69,22 @@ void Session::inferMetadata() {
     Run.Metadata.TimestampISO = IsoBuf;
 }
 
+void Session::ensureStoreInitialized() {
+  if (CASStore)
+    return;
+
+  std::string OutPath = getOutputPath();
+  SmallString<128> StoreDir(OutPath);
+  if (StringRef(StoreDir).ends_with(".vernier.json")) {
+    StoreDir.resize(StoreDir.size() - StringRef(".vernier.json").size());
+    StoreDir.append(".vernier.store");
+  } else {
+    sys::path::replace_extension(StoreDir, "vernier.store");
+  }
+  CASStore = std::make_unique<ContentAddressedStore>(std::string(StoreDir.str()));
+  Run.Metadata.StorePath = std::string(sys::path::filename(StoreDir));
+}
+
 void Session::initialize(const std::string &InputFile,
                          const std::string &OutputFile) {
   std::lock_guard<std::mutex> Lock(SinkMutex);
@@ -77,11 +94,16 @@ void Session::initialize(const std::string &InputFile,
     ResolvedOutputFile = OutputFile;
   Run.Metadata.InputFile = ResolvedInputFile;
   Run.Metadata.OutputFile = ResolvedOutputFile;
+  ensureStoreInitialized();
 }
 
 void Session::setOutputPath(const std::string &Path) {
   std::lock_guard<std::mutex> Lock(SinkMutex);
   CustomOutputPath = Path;
+  if (CASStore) {
+    CASStore.reset();
+  }
+  ensureStoreInitialized();
 }
 
 std::string Session::getOutputPath() const {
@@ -103,6 +125,11 @@ void Session::setEmitDiffs(bool Enable) {
 
 bool Session::getEmitDiffs() const {
   return EmitDiffs.load();
+}
+
+ContentAddressedStore *Session::getStore() {
+  std::lock_guard<std::mutex> Lock(SinkMutex);
+  return CASStore.get();
 }
 
 void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
@@ -174,6 +201,21 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &Unit,
       DiffId = formatv("diff_{0}", Frame.InvocationId).str();
       std::lock_guard<std::mutex> Lock(SinkMutex);
       Run.Diffs[DiffId] = std::move(Diff);
+    }
+  }
+
+  // Content-addressed IR snapshot recording
+  if (Changed) {
+    std::lock_guard<std::mutex> Lock(SinkMutex);
+    ensureStoreInitialized();
+    if (CASStore) {
+      std::string SnapKey = formatv("inv_{0}_after", Frame.InvocationId).str();
+      if (Unit.F) {
+        std::string BodyHash = CASStore->storeFunctionBody(*Unit.F);
+        Run.Snapshots[SnapKey][Unit.F->getName().str()] = BodyHash;
+      } else if (Unit.M) {
+        Run.Snapshots[SnapKey] = CASStore->captureSnapshot(*Unit.M);
+      }
     }
   }
 
@@ -292,6 +334,10 @@ void Session::flush() {
     return;
 
   std::lock_guard<std::mutex> Lock(SinkMutex);
+
+  ensureStoreInitialized();
+  if (CASStore)
+    CASStore->writeManifest();
 
   auto Now = std::chrono::steady_clock::now();
   Run.Summary.TotalWallNs = std::chrono::duration_cast<std::chrono::nanoseconds>(

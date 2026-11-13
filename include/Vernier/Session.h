@@ -2,10 +2,12 @@
 #define VERNIER_SESSION_H
 
 #include "Vernier/Schema.h"
+#include "Vernier/Store.h"
 #include "Vernier/support.h"
 #include "llvm/ADT/StringRef.h"
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -44,6 +46,7 @@ public:
   void flush();
 
   schema::SessionRun &getRun();
+  ContentAddressedStore *getStore();
 
 private:
   Session();
@@ -62,9 +65,11 @@ private:
 
   std::mutex SinkMutex;
   schema::SessionRun Run;
+  std::unique_ptr<ContentAddressedStore> CASStore;
   std::atomic<bool> HasFlushed{false};
 
   void inferMetadata();
+  void ensureStoreInitialized();
 };
 
 } // namespace vernier
