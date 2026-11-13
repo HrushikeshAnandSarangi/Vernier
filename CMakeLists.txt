@@ -26,8 +26,11 @@ llvm_map_components_to_libnames(LLVM_LIBS
 
 # Shared plugin module for opt and clang
 add_library(vernier MODULE
+  lib/json.cpp
   lib/plugin.cpp
+  lib/session.cpp
   lib/support.cpp
+  lib/trace.cpp
 )
 
 target_include_directories(vernier SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})

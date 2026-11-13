@@ -1,16 +1,9 @@
-#include "Vernier/support.h"
+#include "Vernier/Trace.h"
 #include "llvm/Config/llvm-config.h"
-#include "llvm/IR/PassInstrumentation.h"
-#include "llvm/IR/PassManager.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
-#include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
-
-namespace {
-int Depth = 0;
-} // namespace
 
 extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
 llvmGetPassPluginInfo() {
@@ -20,21 +13,6 @@ llvmGetPassPluginInfo() {
             if (!PIC)
               return;
 
-            PIC->registerBeforeNonSkippedPassCallback(
-                [](StringRef PassID, Any IR) {
-                  vernier::IRUnit U = vernier::describe(IR);
-                  errs().indent(Depth * 2)
-                      << "> " << PassID << " (" << vernier::KindName(U.K)
-                      << ": " << U.Name << ")\n";
-                  ++Depth;
-                });
-
-            PIC->registerAfterPassCallback(
-                [](StringRef /*PassID*/, Any /*IR*/, const PreservedAnalyses &/*PA*/) {
-                  if (Depth > 0)
-                    --Depth;
-                });
-
-            llvm::errs() << "Tool Loaded, PassBuilder Attached\n";
+            vernier::registerVernierCallbacks(*PIC);
           }};
 }
