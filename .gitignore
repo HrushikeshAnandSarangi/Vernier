@@ -19,9 +19,13 @@ Makefile
 *.bc
 *.s
 
-# Vernier's own output
+# Vernier's own output & storage
 *.vernier.json
+*.vernier.store/
+*.store/
 report/
+report.html
+*.ablate.tmp*
 
 # Tooling
 compile_commands.json
