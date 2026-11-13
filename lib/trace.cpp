@@ -31,13 +31,21 @@ cl::opt<std::string>
                   cl::value_desc("pass_id"), cl::cat(VernierCategory));
 
 void registerVernierCallbacks(PassInstrumentationCallbacks &PIC) {
-  if (!VnOut.empty()) {
+  if (const char *EnvOut = std::getenv("VERNIER_OUT")) {
+    Session::getInstance().setOutputPath(EnvOut);
+  } else if (!VnOut.empty()) {
     Session::getInstance().setOutputPath(VnOut);
   }
-  if (VnDiff) {
+
+  if (std::getenv("VERNIER_DIFF") != nullptr) {
+    Session::getInstance().setEmitDiffs(true);
+  } else if (VnDiff) {
     Session::getInstance().setEmitDiffs(true);
   }
-  if (VnRemarks) {
+
+  if (std::getenv("VERNIER_REMARKS") != nullptr) {
+    Session::getInstance().setCaptureRemarks(true);
+  } else if (VnRemarks) {
     Session::getInstance().setCaptureRemarks(true);
   }
 
