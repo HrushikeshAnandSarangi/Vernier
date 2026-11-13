@@ -30,6 +30,7 @@ add_library(vernier MODULE
   lib/hash.cpp
   lib/json.cpp
   lib/plugin.cpp
+  lib/remarks.cpp
   lib/session.cpp
   lib/significance.cpp
   lib/store.cpp

@@ -11,8 +11,13 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <vector>
+
+namespace llvm {
+class LLVMContext;
+} // namespace llvm
 
 namespace vernier {
 
@@ -27,6 +32,7 @@ struct PassFrame {
   std::string BeforeHash;
   std::string BeforeText;
   IRMetrics BeforeMetrics;
+  std::vector<std::string> RemarkIds;
 };
 
 class Session {
@@ -46,6 +52,13 @@ public:
   void setEmitDiffs(bool Enable);
   bool getEmitDiffs() const;
 
+  void setCaptureRemarks(bool Enable);
+  bool getCaptureRemarks() const;
+  void ensureRemarkHandlerInstalled(llvm::LLVMContext &Ctx);
+  void recordRemark(const std::string &PassName, const std::string &Function,
+                    const std::string &File, uint32_t Line, uint32_t Column,
+                    const std::string &Message);
+
   void setAnalysisManager(llvm::ModuleAnalysisManager *MAM);
   llvm::ModuleAnalysisManager *getAnalysisManager() const;
 
@@ -63,17 +76,20 @@ private:
 
   std::chrono::steady_clock::time_point GlobalStartTime;
   std::atomic<uint64_t> NextInvocationId{0};
+  std::atomic<uint64_t> NextRemarkId{0};
 
   std::string CustomOutputPath;
   std::string ResolvedInputFile;
   std::string ResolvedOutputFile;
   std::atomic<bool> EmitDiffs{false};
+  std::atomic<bool> CaptureRemarks{false};
 
   std::mutex SinkMutex;
   schema::SessionRun Run;
   std::unique_ptr<ContentAddressedStore> CASStore;
   std::atomic<bool> HasFlushed{false};
   llvm::ModuleAnalysisManager *MAM = nullptr;
+  std::set<llvm::LLVMContext *> InstalledContexts;
 
   void inferMetadata();
   void ensureStoreInitialized();

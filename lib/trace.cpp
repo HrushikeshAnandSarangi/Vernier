@@ -37,6 +37,9 @@ void registerVernierCallbacks(PassInstrumentationCallbacks &PIC) {
   if (VnDiff) {
     Session::getInstance().setEmitDiffs(true);
   }
+  if (VnRemarks) {
+    Session::getInstance().setCaptureRemarks(true);
+  }
 
   PIC.registerShouldRunOptionalPassCallback([](StringRef PassID, Any /*IR*/) {
     // Check command line flag

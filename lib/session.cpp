@@ -2,9 +2,11 @@
 #include "Vernier/Diff.h"
 #include "Vernier/Hash.h"
 #include "Vernier/JSON.h"
+#include "Vernier/Remarks.h"
 #include "Vernier/Significance.h"
 #include "Vernier/Store.h"
 #include "llvm/Config/llvm-config.h"
+#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/PassManager.h"
 #include "llvm/Support/FileSystem.h"
@@ -129,6 +131,53 @@ bool Session::getEmitDiffs() const {
   return EmitDiffs.load();
 }
 
+void Session::setCaptureRemarks(bool Enable) {
+  CaptureRemarks.store(Enable);
+}
+
+bool Session::getCaptureRemarks() const {
+  return CaptureRemarks.load();
+}
+
+void Session::ensureRemarkHandlerInstalled(LLVMContext &Ctx) {
+  if (!CaptureRemarks.load())
+    return;
+  std::lock_guard<std::mutex> Lock(SinkMutex);
+  if (InstalledContexts.count(&Ctx))
+    return;
+  InstalledContexts.insert(&Ctx);
+  installDiagnosticHandler(Ctx);
+}
+
+void Session::recordRemark(const std::string &PassName,
+                           const std::string &Function,
+                           const std::string &File, uint32_t Line,
+                           uint32_t Column, const std::string &Message) {
+  std::string RemId = formatv("rem_{0}", NextRemarkId.fetch_add(1)).str();
+
+  uint64_t InvId = 0;
+  if (!ThreadFrameStack.empty()) {
+    ThreadFrameStack.back().RemarkIds.push_back(RemId);
+    InvId = ThreadFrameStack.back().InvocationId;
+  }
+
+  schema::RemarkRecord R;
+  R.Id = RemId;
+  R.InvocationId = InvId;
+  R.PassName = PassName;
+  R.Function = Function;
+  R.File = File;
+  R.Line = Line;
+  R.Column = Column;
+  R.Message = Message;
+
+  {
+    std::lock_guard<std::mutex> Lock(SinkMutex);
+    Run.Remarks.push_back(std::move(R));
+    ++Run.Summary.TotalRemarks;
+  }
+}
+
 void Session::setAnalysisManager(ModuleAnalysisManager *NewMAM) {
   std::lock_guard<std::mutex> Lock(SinkMutex);
   MAM = NewMAM;
@@ -150,6 +199,11 @@ void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
       initialize(SourceFile, ResolvedOutputFile);
     else if (!Unit.M->getName().empty())
       initialize(Unit.M->getName().str(), ResolvedOutputFile);
+  }
+
+  if (Unit.M) {
+    LLVMContext &Ctx = const_cast<Module *>(Unit.M)->getContext();
+    ensureRemarkHandlerInstalled(Ctx);
   }
 
   auto Now = std::chrono::steady_clock::now();
@@ -259,6 +313,7 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &Unit,
   Rec.Change.AfterHash = AfterHash;
   Rec.Significance = Sig;
   Rec.DiffId = DiffId;
+  Rec.RemarkIds = std::move(Frame.RemarkIds);
 
   {
     std::lock_guard<std::mutex> Lock(SinkMutex);
