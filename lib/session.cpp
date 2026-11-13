@@ -2,9 +2,11 @@
 #include "Vernier/Diff.h"
 #include "Vernier/Hash.h"
 #include "Vernier/JSON.h"
+#include "Vernier/Significance.h"
 #include "Vernier/Store.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
@@ -127,6 +129,15 @@ bool Session::getEmitDiffs() const {
   return EmitDiffs.load();
 }
 
+void Session::setAnalysisManager(ModuleAnalysisManager *NewMAM) {
+  std::lock_guard<std::mutex> Lock(SinkMutex);
+  MAM = NewMAM;
+}
+
+ModuleAnalysisManager *Session::getAnalysisManager() const {
+  return MAM;
+}
+
 ContentAddressedStore *Session::getStore() {
   std::lock_guard<std::mutex> Lock(SinkMutex);
   return CASStore.get();
@@ -153,6 +164,8 @@ void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
     BeforeText = getIRText(Unit);
   }
 
+  IRMetrics BeforeMetrics = computeMetrics(Unit, MAM);
+
   PassFrame Frame;
   Frame.InvocationId = NextInvocationId.fetch_add(1);
   Frame.PassID = PassID.str();
@@ -163,6 +176,7 @@ void Session::enterPass(StringRef PassID, const IRUnit &Unit) {
   Frame.ChildDurationNs = 0;
   Frame.BeforeHash = std::move(BeforeHash);
   Frame.BeforeText = std::move(BeforeText);
+  Frame.BeforeMetrics = BeforeMetrics;
 
   ThreadFrameStack.push_back(std::move(Frame));
 }
@@ -219,6 +233,10 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &Unit,
     }
   }
 
+  IRMetrics AfterMetrics = computeMetrics(Unit, MAM);
+  schema::SignificanceInfo Sig =
+      computeSignificanceDelta(Frame.BeforeMetrics, AfterMetrics);
+
   schema::InvocationRecord Rec;
   Rec.Id = Frame.InvocationId;
   Rec.PassID = Frame.PassID;
@@ -239,6 +257,7 @@ void Session::exitPass(StringRef /*PassID*/, const IRUnit &Unit,
   Rec.Change.UnderReporting = (!AllPreserved && !Changed);
   Rec.Change.BeforeHash = Frame.BeforeHash;
   Rec.Change.AfterHash = AfterHash;
+  Rec.Significance = Sig;
   Rec.DiffId = DiffId;
 
   {

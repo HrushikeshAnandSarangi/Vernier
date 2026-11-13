@@ -2,9 +2,11 @@
 #define VERNIER_SESSION_H
 
 #include "Vernier/Schema.h"
+#include "Vernier/Significance.h"
 #include "Vernier/Store.h"
 #include "Vernier/support.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/IR/PassManager.h"
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -24,6 +26,7 @@ struct PassFrame {
   uint64_t ChildDurationNs = 0;
   std::string BeforeHash;
   std::string BeforeText;
+  IRMetrics BeforeMetrics;
 };
 
 class Session {
@@ -42,6 +45,9 @@ public:
 
   void setEmitDiffs(bool Enable);
   bool getEmitDiffs() const;
+
+  void setAnalysisManager(llvm::ModuleAnalysisManager *MAM);
+  llvm::ModuleAnalysisManager *getAnalysisManager() const;
 
   void flush();
 
@@ -67,6 +73,7 @@ private:
   schema::SessionRun Run;
   std::unique_ptr<ContentAddressedStore> CASStore;
   std::atomic<bool> HasFlushed{false};
+  llvm::ModuleAnalysisManager *MAM = nullptr;
 
   void inferMetadata();
   void ensureStoreInitialized();

@@ -31,6 +31,7 @@ add_library(vernier MODULE
   lib/json.cpp
   lib/plugin.cpp
   lib/session.cpp
+  lib/significance.cpp
   lib/store.cpp
   lib/support.cpp
   lib/trace.cpp
