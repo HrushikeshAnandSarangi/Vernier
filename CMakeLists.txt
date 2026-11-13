@@ -96,3 +96,45 @@ if(NOT LLVM_ENABLE_EH)
 endif()
 
 enable_testing()
+
+# Unit test: Diffing
+add_executable(test_diff
+  test/test_diff.cpp
+  lib/diff.cpp
+)
+target_include_directories(test_diff SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(test_diff PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_definitions(test_diff PRIVATE ${LLVM_DEFS})
+target_link_libraries(test_diff PRIVATE ${LLVM_LIBS})
+add_test(NAME test_diff COMMAND test_diff)
+
+# Unit test: Compare / Sequence Alignment
+add_executable(test_compare
+  test/test_compare.cpp
+  tools/vernier-tool/compare.cpp
+)
+target_include_directories(test_compare SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(test_compare PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include tools/vernier-tool)
+target_compile_definitions(test_compare PRIVATE ${LLVM_DEFS})
+target_link_libraries(test_compare PRIVATE ${LLVM_LIBS})
+add_test(NAME test_compare COMMAND test_compare)
+
+# Unit test: Report Generation
+add_executable(test_report
+  test/test_report.cpp
+  tools/vernier-tool/report.cpp
+)
+target_include_directories(test_report SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(test_report PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include tools/vernier-tool)
+target_compile_definitions(test_report PRIVATE ${LLVM_DEFS})
+target_link_libraries(test_report PRIVATE ${LLVM_LIBS})
+add_test(NAME test_report COMMAND test_report)
+
+# Integration smoke test
+find_program(BASH_BIN bash)
+if(BASH_BIN)
+  add_test(NAME test_smoke
+    COMMAND ${BASH_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/test/smoke.sh $<TARGET_FILE:vernier> $<TARGET_FILE:vernier-tool> ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+endif()
+

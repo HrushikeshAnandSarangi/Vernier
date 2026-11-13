@@ -1,0 +1,1884 @@
+================================================================================
+                        VERNIER PIPELINE PROFILE REPORT                         
+================================================================================
+Input Source      : examples/loop_vectorize.c
+Target Triple     : unknown
+Total Wall Time   : 0 ns (368.90 ms accounted self time)
+Pass Invocations  : 148 total (IR Mutated: 38, Under-reported PA: 15)
+Attributed Remarks: 1
+
+--------------------------------------------------------------------------------
+1. TOP HOTSPOTS (BY PASS SELF TIME)
+--------------------------------------------------------------------------------
+Rank  Self Time    % Total    Activity Bar      Pass ID (Target)
+--------------------------------------------------------------------------------
+  1.    85.72 ms    23.2%   [###............]   PassManager<Function> (vector_add [function])
+  2.    57.82 ms    15.7%   [##.............]   ModuleToFunctionPassAdaptor (/tmp/vec.ll [module])
+  3.    43.67 ms    11.8%   [##.............]   PassManager<Function> (vector_add [function])
+  4.    31.94 ms     8.7%   [#..............]   PassManager<Function> (vector_add [function])
+  5.     9.24 ms     2.5%   [...............]   PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> (.lr.ph [loop])
+  6.     8.79 ms     2.4%   [...............]   PassManager<Function> (vector_add [function])
+  7.     8.51 ms     2.3%   [...............]   SimplifyCFGPass (vector_add [function])
+  8.     8.11 ms     2.2%   [...............]   RelLookupTableConverterPass (/tmp/vec.ll [module])
+  9.     7.73 ms     2.1%   [...............]   PassManager<Function> (vector_add [function])
+ 10.     7.14 ms     1.9%   [...............]   FunctionToLoopPassAdaptor (vector_add [function])
+
+--------------------------------------------------------------------------------
+2. OPTIMIZATION SIGNIFICANCE (TOP IMPACT PASSES)
+--------------------------------------------------------------------------------
+Pass ID                    Target               dInst  dBB  dMem  dCall  Vec  TTI Cost
+--------------------------------------------------------------------------------
+LoopVectorizePass         vector_add             +34   +4    +6     +2    4       +22
+PassManager<Function>     vector_add             -22   -1   -20      0    1       -24
+ModuleToFunctionPassAda.. /tmp/vec.ll            -22   -1   -20      0    1       -24
+ModuleToFunctionPassAda.. /tmp/vec.ll            +25   +4    +6     +2    4       +20
+PassManager<Function>     vector_add             +25   +4    +6     +2    4       +20
+SROAPass                  vector_add             -19    0   -20      0    1       -12
+SimplifyCFGPass           vector_add              -4   -3     0      0    4        -3
+InstCombinePass           vector_add              -9    0     0      0    4        -2
+LoopUnrollPass            vector_add              +3   +2     0      0    4        +2
+SimplifyCFGPass           vector_add              -1   -1     0      0    1       -10
+FunctionToLoopPassAdaptor vector_add              +2   +2     0      0    1        +2
+PassManager<Function>     vector_add              +2   +2     0      0    1        +2
+
+--------------------------------------------------------------------------------
+3. REMARKS & MISSED OPTIMIZATIONS
+--------------------------------------------------------------------------------
+[#1] Pass: loop-vectorize
+     Function: vector_add
+     Message : vectorized loop (vectorization width: 4, interleaved count: 2)
+
+--------------------------------------------------------------------------------
+4. CODEGEN ABLATION IMPACT
+--------------------------------------------------------------------------------
+Pass ID                    Obj Size (B)   Delta (B)   Mach Insts   Delta Insts
+--------------------------------------------------------------------------------
+(Baseline)                         1496          +0           41           +0
+LoopVectorizePass                  1496           0           41             0
+SROAPass                           1496           0           41             0
+SimplifyCFGPass                    1496           0           41             0
+
+--------------------------------------------------------------------------------
+5. PIPELINE EXECUTION TREE
+--------------------------------------------------------------------------------
+Depth  Self Time   Status  Pass ID & Target
+--------------------------------------------------------------------------------
+[0]      1.33 ms    [ ]   Annotation2MetadataPass (/tmp/vec.ll)
+[0]    201.78 us    [ ]   ForceFunctionAttrsPass (/tmp/vec.ll)
+[0]     97.94 us    [ ]   {anonymous}::VernierAnalysisAnchorPass (/tmp/vec.ll)
+[0]    188.12 us    [!]   InferFunctionAttrsPass (/tmp/vec.ll)
+[0]    131.60 us    [ ]   CoroEarlyPass (/tmp/vec.ll)
+[2]     53.38 us    [ ]       LowerExpectIntrinsicPass (vector_add)
+[2]      8.51 ms    [*]       SimplifyCFGPass (vector_add) [dInst: -1]
+[2]      2.01 ms    [*]       SROAPass (vector_add) [dInst: -19]
+[2]      1.46 ms    [*]       EarlyCSEPass (vector_add) [dInst: -2]
+[1]     31.94 ms    [*]     PassManager<Function> (vector_add) [dInst: -22]
+[0]      2.80 ms    [*]   ModuleToFunctionPassAdaptor (/tmp/vec.ll) [dInst: -22]
+[0]    157.89 us    [ ]   OpenMPOptPass (/tmp/vec.ll)
+[0]      1.26 ms    [ ]   IPSCCPPass (/tmp/vec.ll)
+[0]    296.46 us    [ ]   CalledValuePropagationPass (/tmp/vec.ll)
+[0]    177.09 us    [!]   GlobalOptPass (/tmp/vec.ll)
+[2]    124.06 us    [ ]       PromotePass (vector_add)
+[2]      4.04 ms    [*]       InstCombinePass (vector_add)
+[2]     98.10 us    [ ]       SimplifyCFGPass (vector_add)
+[1]      7.73 ms    [*]     PassManager<Function> (vector_add)
+[0]      2.69 ms    [*]   ModuleToFunctionPassAdaptor (/tmp/vec.ll)
+[0]    184.38 us    [ ]   AlwaysInlinerPass (/tmp/vec.ll)
+[1]    740.74 us    [ ]     RequireAnalysisPass<llvm::GlobalsAA, llvm::Module, llvm::AnalysisManager<Module>> (/tmp/vec.ll)
+[2]     42.64 us    [!]       InvalidateAnalysisPass<llvm::AAManager> (vector_add)
+[1]     95.86 us    [!]     ModuleToFunctionPassAdaptor (/tmp/vec.ll)
+[1]     82.53 us    [ ]     RequireAnalysisPass<llvm::ProfileSummaryAnalysis, llvm::Module, llvm::AnalysisManager<Module>> (/tmp/vec.ll)
+[4]     62.27 us    [ ]           InlinerPass ((vector_add))
+[4]    181.66 us    [!]           PostOrderFunctionAttrsPass ((vector_add))
+[4]     35.67 us    [ ]           OpenMPOptCGSCCPass ((vector_add))
+[6]    119.39 us    [ ]               SROAPass (vector_add)
+[6]    437.31 us    [ ]               EarlyCSEPass (vector_add)
+[6]     46.00 us    [ ]               SpeculativeExecutionPass (vector_add)
+[6]    162.79 us    [ ]               JumpThreadingPass (vector_add)
+[6]    795.46 us    [!]               CorrelatedValuePropagationPass (vector_add)
+[6]     58.54 us    [ ]               SimplifyCFGPass (vector_add)
+[6]    108.33 us    [ ]               InstCombinePass (vector_add)
+[6]    121.70 us    [ ]               AggressiveInstCombinePass (vector_add)
+[6]     84.74 us    [ ]               LibCallsShrinkWrapPass (vector_add)
+[6]     94.11 us    [!]               TailCallElimPass (vector_add)
+[6]     82.46 us    [ ]               SimplifyCFGPass (vector_add)
+[6]    359.03 us    [ ]               ReassociatePass (vector_add)
+[6]      1.38 ms    [ ]               ConstraintEliminationPass (vector_add)
+[8]    107.90 us    [ ]                   LoopSimplifyPass (vector_add)
+[8]    154.50 us    [ ]                   LCSSAPass (vector_add)
+[7]    107.79 us    [ ]                 PassManager<Function> (vector_add)
+[8]    107.89 us    [ ]                   LoopInstSimplifyPass (<unnamed loop>)
+[8]     89.83 us    [ ]                   LoopSimplifyCFGPass (<unnamed loop>)
+[8]    390.85 us    [ ]                   LICMPass (<unnamed loop>)
+[8]      1.00 ms    [*]                   LoopRotatePass (<unnamed loop>) [dInst: +2]
+[8]    122.94 us    [ ]                   LICMPass (<unnamed loop>)
+[8]    106.36 us    [ ]                   SimpleLoopUnswitchPass (<unnamed loop>)
+[7]      6.95 ms    [*]                 PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> (<unnamed loop>) [dInst: +2]
+[6]      3.39 ms    [*]               FunctionToLoopPassAdaptor (vector_add) [dInst: +2]
+[6]    332.62 us    [*]               SimplifyCFGPass (vector_add) [dInst: -2]
+[6]      1.04 ms    [*]               InstCombinePass (vector_add)
+[8]    165.56 us    [*]                   LoopSimplifyPass (vector_add) [dInst: +2]
+[8]     88.83 us    [ ]                   LCSSAPass (vector_add)
+[7]      8.79 ms    [*]                 PassManager<Function> (vector_add) [dInst: +2]
+[8]      1.25 ms    [ ]                   LoopIdiomRecognizePass (.lr.ph)
+[8]      1.49 ms    [*]                   IndVarSimplifyPass (.lr.ph)
+[8]    347.98 us    [ ]                   LoopDeletionPass (.lr.ph)
+[8]    441.10 us    [ ]                   LoopFullUnrollPass (.lr.ph)
+[7]      9.24 ms    [*]                 PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> (.lr.ph)
+[6]      7.14 ms    [*]               FunctionToLoopPassAdaptor (vector_add) [dInst: +2]
+[6]     92.35 us    [ ]               SROAPass (vector_add)
+[6]     54.89 us    [ ]               VectorCombinePass (vector_add)
+[6]     91.75 us    [ ]               MergedLoadStoreMotionPass (vector_add)
+[6]    755.74 us    [ ]               GVNPass (vector_add)
+[6]    125.94 us    [ ]               SCCPPass (vector_add)
+[6]    135.47 us    [ ]               BDCEPass (vector_add)
+[6]      6.55 ms    [*]               InstCombinePass (vector_add)
+[6]    269.43 us    [*]               JumpThreadingPass (vector_add) [dInst: -1]
+[6]    142.30 us    [!]               CorrelatedValuePropagationPass (vector_add)
+[6]    227.86 us    [ ]               ADCEPass (vector_add)
+[6]    139.92 us    [ ]               MemCpyOptPass (vector_add)
+[6]    324.99 us    [ ]               DSEPass (vector_add)
+[6]     92.11 us    [ ]               MoveAutoInitPass (vector_add)
+[8]     67.64 us    [*]                   LoopSimplifyPass (vector_add) [dInst: +1]
+[8]    111.50 us    [ ]                   LCSSAPass (vector_add)
+[7]      2.80 ms    [*]                 PassManager<Function> (vector_add) [dInst: +1]
+[7]     99.40 us    [ ]                 LICMPass (.lr.ph)
+[6]      3.36 ms    [*]               FunctionToLoopPassAdaptor (vector_add) [dInst: +1]
+[6]     97.47 us    [ ]               CoroElidePass (vector_add)
+[6]    202.46 us    [*]               SimplifyCFGPass (vector_add) [dInst: -1]
+[6]    222.12 us    [ ]               InstCombinePass (vector_add)
+[5]     43.67 ms    [*]             PassManager<Function> (vector_add) [dInst: +1]
+[4]      2.51 ms    [!]           CGSCCToFunctionPassAdaptor ((vector_add))
+[4]    182.68 us    [!]           PostOrderFunctionAttrsPass ((vector_add))
+[5]    104.57 us    [ ]             RequireAnalysisPass<llvm::ShouldNotRunFunctionPassesAnalysis, llvm::Function, llvm::AnalysisManager<Function>> (vector_add)
+[4]     33.27 us    [ ]           CGSCCToFunctionPassAdaptor ((vector_add))
+[4]      3.55 us    [ ]           CoroSplitPass ((vector_add))
+[3]     97.62 us    [!]         PassManager<LazyCallGraph::SCC, CGSCCAnalysisManager, LazyCallGraph &, CGSCCUpdateResult &> ((vector_add))
+[2]     16.42 us    [!]       DevirtSCCRepeatedPass ((vector_add))
+[1]    420.72 us    [*]     ModuleToPostOrderCGSCCPassAdaptor (/tmp/vec.ll) [dInst: +1]
+[2]     48.11 us    [!]       InvalidateAnalysisPass<llvm::ShouldNotRunFunctionPassesAnalysis> (vector_add)
+[1]    111.05 us    [!]     ModuleToFunctionPassAdaptor (/tmp/vec.ll)
+[0]      2.79 ms    [*]   ModuleInlinerWrapperPass (/tmp/vec.ll) [dInst: +1]
+[0]    284.13 us    [ ]   DeadArgumentEliminationPass (/tmp/vec.ll)
+[0]    130.24 us    [ ]   CoroCleanupPass (/tmp/vec.ll)
+[0]    125.94 us    [ ]   GlobalOptPass (/tmp/vec.ll)
+[0]    181.86 us    [ ]   GlobalDCEPass (/tmp/vec.ll)
+[0]    144.80 us    [ ]   EliminateAvailableExternallyPass (/tmp/vec.ll)
+[0]    138.27 us    [ ]   ReversePostOrderFunctionAttrsPass (/tmp/vec.ll)
+[0]    123.31 us    [ ]   RecomputeGlobalsAAPass (/tmp/vec.ll)
+[2]    163.58 us    [ ]       Float2IntPass (vector_add)
+[2]     72.43 us    [ ]       LowerConstantIntrinsicsPass (vector_add)
+[4]    124.94 us    [*]           LoopSimplifyPass (vector_add) [dInst: +1]
+[4]    116.34 us    [ ]           LCSSAPass (vector_add)
+[3]      3.20 ms    [*]         PassManager<Function> (vector_add) [dInst: +1]
+[4]     54.57 us    [ ]           LoopRotatePass (.lr.ph)
+[4]    173.61 us    [ ]           LoopDeletionPass (.lr.ph)
+[3]    131.10 us    [ ]         PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> (.lr.ph)
+[2]      3.09 ms    [*]       FunctionToLoopPassAdaptor (vector_add) [dInst: +1]
+[2]    206.26 us    [ ]       LoopDistributePass (vector_add)
+[2]    128.36 us    [ ]       InjectTLIMappings (vector_add)
+[2]      6.35 ms    [*]       LoopVectorizePass (vector_add) [dInst: +34] [SIMD: 4x]
+[2]    256.88 us    [ ]       InferAlignmentPass (vector_add) [SIMD: 4x]
+[2]      1.16 ms    [*]       LoopLoadEliminationPass (vector_add) [dInst: +1] [SIMD: 4x]
+[2]      1.05 ms    [*]       InstCombinePass (vector_add) [dInst: -9] [SIMD: 4x]
+[2]    308.32 us    [*]       SimplifyCFGPass (vector_add) [dInst: -4] [SIMD: 4x]
+[2]      2.18 ms    [ ]       SLPVectorizerPass (vector_add) [SIMD: 4x]
+[2]    163.43 us    [ ]       VectorCombinePass (vector_add) [SIMD: 4x]
+[2]    398.71 us    [ ]       InstCombinePass (vector_add) [SIMD: 4x]
+[2]    542.86 us    [*]       LoopUnrollPass (vector_add) [dInst: +3] [SIMD: 4x]
+[2]    613.53 us    [ ]       WarnMissedTransformationsPass (vector_add) [SIMD: 4x]
+[2]    242.94 us    [ ]       SROAPass (vector_add) [SIMD: 4x]
+[2]    245.91 us    [ ]       InferAlignmentPass (vector_add) [SIMD: 4x]
+[2]      3.01 ms    [ ]       InstCombinePass (vector_add) [SIMD: 4x]
+[4]    242.57 us    [ ]           LoopSimplifyPass (vector_add) [SIMD: 4x]
+[4]    205.21 us    [ ]           LCSSAPass (vector_add) [SIMD: 4x]
+[3]      1.20 ms    [ ]         PassManager<Function> (vector_add) [SIMD: 4x]
+[3]    432.72 us    [ ]         LICMPass (vector.body) [SIMD: 4x]
+[3]    196.71 us    [ ]         LICMPass (.lr.ph) [SIMD: 4x]
+[2]    817.89 us    [ ]       FunctionToLoopPassAdaptor (vector_add) [SIMD: 4x]
+[2]    174.95 us    [ ]       AlignmentFromAssumptionsPass (vector_add) [SIMD: 4x]
+[2]    242.30 us    [ ]       LoopSinkPass (vector_add) [SIMD: 4x]
+[2]    245.04 us    [ ]       InstSimplifyPass (vector_add) [SIMD: 4x]
+[2]    216.91 us    [ ]       DivRemPairsPass (vector_add) [SIMD: 4x]
+[2]      1.22 ms    [!]       TailCallElimPass (vector_add) [SIMD: 4x]
+[2]    551.20 us    [*]       SimplifyCFGPass (vector_add) [dInst: -1] [SIMD: 4x]
+[1]     85.72 ms    [*]     PassManager<Function> (vector_add) [dInst: +25] [SIMD: 4x]
+[0]     57.82 ms    [*]   ModuleToFunctionPassAdaptor (/tmp/vec.ll) [dInst: +25] [SIMD: 4x]
+[0]      1.17 ms    [ ]   GlobalDCEPass (/tmp/vec.ll) [SIMD: 4x]
+[0]    280.64 us    [ ]   ConstantMergePass (/tmp/vec.ll) [SIMD: 4x]
+[0]      1.92 ms    [ ]   CGProfilePass (/tmp/vec.ll) [SIMD: 4x]
+[0]      8.11 ms    [ ]   RelLookupTableConverterPass (/tmp/vec.ll) [SIMD: 4x]
+[1]    284.61 us    [ ]     AnnotationRemarksPass (vector_add) [SIMD: 4x]
+[0]      1.28 ms    [ ]   ModuleToFunctionPassAdaptor (/tmp/vec.ll) [SIMD: 4x]
+[0]      2.10 ms    [ ]   VerifierPass (/tmp/vec.ll) [SIMD: 4x]
+
+--------------------------------------------------------------------------------
+6. UNIFIED IR MODIFICATION DIFFS (38 Recorded Mutations)
+--------------------------------------------------------------------------------
+>>> Invocation #8: SimplifyCFGPass on vector_add (function)
+    Hashes: 237d194f60607541 -> e84131ca60ebf3d1
+--- vector_add (before)
++++ vector_add (after)
+@@ -12,37 +12,34 @@
+   store i32 0, ptr %9, align 4
+   br label %10
+ 
+- 10:                                               ; preds = %30, %4
++ 10:                                               ; preds = %14, %4
+    %11 = load i32, ptr %9, align 4
+    %12 = load i32, ptr %8, align 4
+    %13 = icmp slt i32 %11, %12
+-   br i1 %13, label %14, label %33
++   br i1 %13, label %14, label %32
+  
+  14:                                               ; preds = %10
+    %15 = load ptr, ptr %6, align 8
+    %16 = load i32, ptr %9, align 4
+    %17 = sext i32 %16 to i64
+    %18 = getelementptr inbounds float, ptr %15, i64 %17
+    %19 = load float, ptr %18, align 4
+    %20 = load ptr, ptr %7, align 8
+    %21 = load i32, ptr %9, align 4
+    %22 = sext i32 %21 to i64
+    %23 = getelementptr inbounds float, ptr %20, i64 %22
+    %24 = load float, ptr %23, align 4
+    %25 = call float @llvm.fmuladd.f32(float %19, float 2.500000e+00, float %24)
+    %26 = load ptr, ptr %5, align 8
+    %27 = load i32, ptr %9, align 4
+    %28 = sext i32 %27 to i64
+    %29 = getelementptr inbounds float, ptr %26, i64 %28
+    store float %25, ptr %29, align 4
+-   br label %30
+- 
+- 30:                                               ; preds = %14
+-   %31 = load i32, ptr %9, align 4
+-   %32 = add nsw i32 %31, 1
+-   store i32 %32, ptr %9, align 4
++   %30 = load i32, ptr %9, align 4
++   %31 = add nsw i32 %30, 1
++   store i32 %31, ptr %9, align 4
+    br label %10, !llvm.loop !6
+  
+- 33:                                               ; preds = %10
++ 32:                                               ; preds = %10
+   ret void
+ }
+
+>>> Invocation #9: SROAPass on vector_add (function)
+    Hashes: e84131ca60ebf3d1 -> b38a4eda069f92ab
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,45 +1,26 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias noundef %0, ptr noalias noundef %1, ptr noalias noundef %2, i32 noundef %3) #0 {
+-   %5 = alloca ptr, align 8
+-   %6 = alloca ptr, align 8
+-   %7 = alloca ptr, align 8
+-   %8 = alloca i32, align 4
+-   %9 = alloca i32, align 4
+-   store ptr %0, ptr %5, align 8
+-   store ptr %1, ptr %6, align 8
+-   store ptr %2, ptr %7, align 8
+-   store i32 %3, ptr %8, align 4
+-   store i32 0, ptr %9, align 4
+-   br label %10
++   br label %5
+  
+- 10:                                               ; preds = %14, %4
+-   %11 = load i32, ptr %9, align 4
+-   %12 = load i32, ptr %8, align 4
+-   %13 = icmp slt i32 %11, %12
+-   br i1 %13, label %14, label %32
++ 5:                                                ; preds = %7, %4
++   %.0 = phi i32 [ 0, %4 ], [ %17, %7 ]
++   %6 = icmp slt i32 %.0, %3
++   br i1 %6, label %7, label %18
+  
+- 14:                                               ; preds = %10
+-   %15 = load ptr, ptr %6, align 8
+-   %16 = load i32, ptr %9, align 4
+-   %17 = sext i32 %16 to i64
+-   %18 = getelementptr inbounds float, ptr %15, i64 %17
+-   %19 = load float, ptr %18, align 4
+-   %20 = load ptr, ptr %7, align 8
+-   %21 = load i32, ptr %9, align 4
+-   %22 = sext i32 %21 to i64
+-   %23 = getelementptr inbounds float, ptr %20, i64 %22
+-   %24 = load float, ptr %23, align 4
+-   %25 = call float @llvm.fmuladd.f32(float %19, float 2.500000e+00, float %24)
+-   %26 = load ptr, ptr %5, align 8
+-   %27 = load i32, ptr %9, align 4
+-   %28 = sext i32 %27 to i64
+-   %29 = getelementptr inbounds float, ptr %26, i64 %28
+-   store float %25, ptr %29, align 4
+-   %30 = load i32, ptr %9, align 4
+-   %31 = add nsw i32 %30, 1
+-   store i32 %31, ptr %9, align 4
+-   br label %10, !llvm.loop !6
++ 7:                                                ; preds = %5
++   %8 = sext i32 %.0 to i64
++   %9 = getelementptr inbounds float, ptr %1, i64 %8
++   %10 = load float, ptr %9, align 4
++   %11 = sext i32 %.0 to i64
++   %12 = getelementptr inbounds float, ptr %2, i64 %11
++   %13 = load float, ptr %12, align 4
++   %14 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %13)
++   %15 = sext i32 %.0 to i64
++   %16 = getelementptr inbounds float, ptr %0, i64 %15
++   store float %14, ptr %16, align 4
++   %17 = add nsw i32 %.0, 1
++   br label %5, !llvm.loop !6
+  
+- 32:                                               ; preds = %10
++ 18:                                               ; preds = %5
+   ret void
+ }
+
+>>> Invocation #10: EarlyCSEPass on vector_add (function)
+    Hashes: b38a4eda069f92ab -> 58000467bdde80c7
+--- vector_add (before)
++++ vector_add (after)
+@@ -3,24 +3,22 @@
+   br label %5
+ 
+ 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %17, %7 ]
++   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+    %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %18
++   br i1 %6, label %7, label %16
+  
+  7:                                                ; preds = %5
+    %8 = sext i32 %.0 to i64
+    %9 = getelementptr inbounds float, ptr %1, i64 %8
+    %10 = load float, ptr %9, align 4
+-   %11 = sext i32 %.0 to i64
+-   %12 = getelementptr inbounds float, ptr %2, i64 %11
+-   %13 = load float, ptr %12, align 4
+-   %14 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %13)
+-   %15 = sext i32 %.0 to i64
+-   %16 = getelementptr inbounds float, ptr %0, i64 %15
+-   store float %14, ptr %16, align 4
+-   %17 = add nsw i32 %.0, 1
++   %11 = getelementptr inbounds float, ptr %2, i64 %8
++   %12 = load float, ptr %11, align 4
++   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
++   %14 = getelementptr inbounds float, ptr %0, i64 %8
++   store float %13, ptr %14, align 4
++   %15 = add nsw i32 %.0, 1
+    br label %5, !llvm.loop !6
+  
+- 18:                                               ; preds = %5
++ 16:                                               ; preds = %5
+   ret void
+ }
+
+>>> Invocation #6: PassManager<Function> on vector_add (function)
+    Hashes: 237d194f60607541 -> 58000467bdde80c7
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,48 +1,24 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias noundef %0, ptr noalias noundef %1, ptr noalias noundef %2, i32 noundef %3) #0 {
+-   %5 = alloca ptr, align 8
+-   %6 = alloca ptr, align 8
+-   %7 = alloca ptr, align 8
+-   %8 = alloca i32, align 4
+-   %9 = alloca i32, align 4
+-   store ptr %0, ptr %5, align 8
+-   store ptr %1, ptr %6, align 8
+-   store ptr %2, ptr %7, align 8
+-   store i32 %3, ptr %8, align 4
+-   store i32 0, ptr %9, align 4
+-   br label %10
+- 
+- 10:                                               ; preds = %30, %4
+-   %11 = load i32, ptr %9, align 4
+-   %12 = load i32, ptr %8, align 4
+-   %13 = icmp slt i32 %11, %12
+-   br i1 %13, label %14, label %33
++   br label %5
+  
+- 14:                                               ; preds = %10
+-   %15 = load ptr, ptr %6, align 8
+-   %16 = load i32, ptr %9, align 4
+-   %17 = sext i32 %16 to i64
+-   %18 = getelementptr inbounds float, ptr %15, i64 %17
+-   %19 = load float, ptr %18, align 4
+-   %20 = load ptr, ptr %7, align 8
+-   %21 = load i32, ptr %9, align 4
+-   %22 = sext i32 %21 to i64
+-   %23 = getelementptr inbounds float, ptr %20, i64 %22
+-   %24 = load float, ptr %23, align 4
+-   %25 = call float @llvm.fmuladd.f32(float %19, float 2.500000e+00, float %24)
+-   %26 = load ptr, ptr %5, align 8
+-   %27 = load i32, ptr %9, align 4
+-   %28 = sext i32 %27 to i64
+-   %29 = getelementptr inbounds float, ptr %26, i64 %28
+-   store float %25, ptr %29, align 4
+-   br label %30
++ 5:                                                ; preds = %7, %4
++   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
++   %6 = icmp slt i32 %.0, %3
++   br i1 %6, label %7, label %16
+  
+- 30:                                               ; preds = %14
+-   %31 = load i32, ptr %9, align 4
+-   %32 = add nsw i32 %31, 1
+-   store i32 %32, ptr %9, align 4
+-   br label %10, !llvm.loop !6
++ 7:                                                ; preds = %5
++   %8 = sext i32 %.0 to i64
++   %9 = getelementptr inbounds float, ptr %1, i64 %8
++   %10 = load float, ptr %9, align 4
++   %11 = getelementptr inbounds float, ptr %2, i64 %8
++   %12 = load float, ptr %11, align 4
++   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
++   %14 = getelementptr inbounds float, ptr %0, i64 %8
++   store float %13, ptr %14, align 4
++   %15 = add nsw i32 %.0, 1
++   br label %5, !llvm.loop !6
+  
+- 33:                                               ; preds = %10
++ 16:                                               ; preds = %5
+   ret void
+ }
+
+>>> Invocation #5: ModuleToFunctionPassAdaptor on /tmp/vec.ll (module)
+    Hashes: 237d194f60607541 -> 58000467bdde80c7
+--- /tmp/vec.ll (before)
++++ /tmp/vec.ll (after)
+@@ -5,50 +5,26 @@
+ 
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias noundef %0, ptr noalias noundef %1, ptr noalias noundef %2, i32 noundef %3) #0 {
+-   %5 = alloca ptr, align 8
+-   %6 = alloca ptr, align 8
+-   %7 = alloca ptr, align 8
+-   %8 = alloca i32, align 4
+-   %9 = alloca i32, align 4
+-   store ptr %0, ptr %5, align 8
+-   store ptr %1, ptr %6, align 8
+-   store ptr %2, ptr %7, align 8
+-   store i32 %3, ptr %8, align 4
+-   store i32 0, ptr %9, align 4
+-   br label %10
+- 
+- 10:                                               ; preds = %30, %4
+-   %11 = load i32, ptr %9, align 4
+-   %12 = load i32, ptr %8, align 4
+-   %13 = icmp slt i32 %11, %12
+-   br i1 %13, label %14, label %33
++   br label %5
+  
+- 14:                                               ; preds = %10
+-   %15 = load ptr, ptr %6, align 8
+-   %16 = load i32, ptr %9, align 4
+-   %17 = sext i32 %16 to i64
+-   %18 = getelementptr inbounds float, ptr %15, i64 %17
+-   %19 = load float, ptr %18, align 4
+-   %20 = load ptr, ptr %7, align 8
+-   %21 = load i32, ptr %9, align 4
+-   %22 = sext i32 %21 to i64
+-   %23 = getelementptr inbounds float, ptr %20, i64 %22
+-   %24 = load float, ptr %23, align 4
+-   %25 = call float @llvm.fmuladd.f32(float %19, float 2.500000e+00, float %24)
+-   %26 = load ptr, ptr %5, align 8
+-   %27 = load i32, ptr %9, align 4
+-   %28 = sext i32 %27 to i64
+-   %29 = getelementptr inbounds float, ptr %26, i64 %28
+-   store float %25, ptr %29, align 4
+-   br label %30
++ 5:                                                ; preds = %7, %4
++   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
++   %6 = icmp slt i32 %.0, %3
++   br i1 %6, label %7, label %16
+  
+- 30:                                               ; preds = %14
+-   %31 = load i32, ptr %9, align 4
+-   %32 = add nsw i32 %31, 1
+-   store i32 %32, ptr %9, align 4
+-   br label %10, !llvm.loop !6
++ 7:                                                ; preds = %5
++   %8 = sext i32 %.0 to i64
++   %9 = getelementptr inbounds float, ptr %1, i64 %8
++   %10 = load float, ptr %9, align 4
++   %11 = getelementptr inbounds float, ptr %2, i64 %8
++   %12 = load float, ptr %11, align 4
++   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
++   %14 = getelementptr inbounds float, ptr %0, i64 %8
++   store float %13, ptr %14, align 4
++   %15 = add nsw i32 %.0, 1
++   br label %5, !llvm.loop !6
+  
+- 33:                                               ; preds = %10
++ 16:                                               ; preds = %5
+   ret void
+ }
+ 
+
+>>> Invocation #18: InstCombinePass on vector_add (function)
+    Hashes: 58000467bdde80c7 -> 06f0c2a1bda70116
+--- vector_add (before)
++++ vector_add (after)
+@@ -8,15 +8,15 @@
+   br i1 %6, label %7, label %16
+ 
+ 7:                                                ; preds = %5
+-   %8 = sext i32 %.0 to i64
++   %8 = zext nneg i32 %.0 to i64
+    %9 = getelementptr inbounds float, ptr %1, i64 %8
+    %10 = load float, ptr %9, align 4
+    %11 = getelementptr inbounds float, ptr %2, i64 %8
+    %12 = load float, ptr %11, align 4
+    %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+    %14 = getelementptr inbounds float, ptr %0, i64 %8
+    store float %13, ptr %14, align 4
+-   %15 = add nsw i32 %.0, 1
++   %15 = add nuw nsw i32 %.0, 1
+   br label %5, !llvm.loop !6
+ 
+ 16:                                               ; preds = %5
+
+>>> Invocation #16: PassManager<Function> on vector_add (function)
+    Hashes: 58000467bdde80c7 -> 06f0c2a1bda70116
+--- vector_add (before)
++++ vector_add (after)
+@@ -8,15 +8,15 @@
+   br i1 %6, label %7, label %16
+ 
+ 7:                                                ; preds = %5
+-   %8 = sext i32 %.0 to i64
++   %8 = zext nneg i32 %.0 to i64
+    %9 = getelementptr inbounds float, ptr %1, i64 %8
+    %10 = load float, ptr %9, align 4
+    %11 = getelementptr inbounds float, ptr %2, i64 %8
+    %12 = load float, ptr %11, align 4
+    %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+    %14 = getelementptr inbounds float, ptr %0, i64 %8
+    store float %13, ptr %14, align 4
+-   %15 = add nsw i32 %.0, 1
++   %15 = add nuw nsw i32 %.0, 1
+   br label %5, !llvm.loop !6
+ 
+ 16:                                               ; preds = %5
+
+>>> Invocation #15: ModuleToFunctionPassAdaptor on /tmp/vec.ll (module)
+    Hashes: 58000467bdde80c7 -> 06f0c2a1bda70116
+--- /tmp/vec.ll (before)
++++ /tmp/vec.ll (after)
+@@ -13,15 +13,15 @@
+   br i1 %6, label %7, label %16
+ 
+ 7:                                                ; preds = %5
+-   %8 = sext i32 %.0 to i64
++   %8 = zext nneg i32 %.0 to i64
+    %9 = getelementptr inbounds float, ptr %1, i64 %8
+    %10 = load float, ptr %9, align 4
+    %11 = getelementptr inbounds float, ptr %2, i64 %8
+    %12 = load float, ptr %11, align 4
+    %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+    %14 = getelementptr inbounds float, ptr %0, i64 %8
+    store float %13, ptr %14, align 4
+-   %15 = add nsw i32 %.0, 1
++   %15 = add nuw nsw i32 %.0, 1
+   br label %5, !llvm.loop !6
+ 
+ 16:                                               ; preds = %5
+
+>>> Invocation #55: LoopRotatePass on <unnamed loop> (loop)
+    Hashes: 06f0c2a1bda70116 -> a88151c9020f21da
+--- <unnamed loop> (before)
++++ <unnamed loop> (after)
+@@ -1,24 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++   %5 = icmp slt i32 0, %3
++   br i1 %5, label %.lr.ph, label %16
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph:                                           ; preds = %4
++   br label %6
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = tail call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ 6:                                                ; preds = %.lr.ph, %6
++   %.08 = phi i32 [ 0, %.lr.ph ], [ %14, %6 ]
++   %7 = zext nneg i32 %.08 to i64
++   %8 = getelementptr inbounds float, ptr %1, i64 %7
++   %9 = load float, ptr %8, align 4
++   %10 = getelementptr inbounds float, ptr %2, i64 %7
++   %11 = load float, ptr %10, align 4
++   %12 = tail call float @llvm.fmuladd.f32(float %9, float 2.500000e+00, float %11)
++   %13 = getelementptr inbounds float, ptr %0, i64 %7
++   store float %12, ptr %13, align 4
++   %14 = add nuw nsw i32 %.08, 1
++   %15 = icmp slt i32 %14, %3
++   br i1 %15, label %6, label %._crit_edge, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %6
++   br label %16
++ 
++ 16:                                               ; preds = %._crit_edge, %4
+   ret void
+ }
+
+>>> Invocation #51: PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> on <unnamed loop> (loop)
+    Hashes: 06f0c2a1bda70116 -> a88151c9020f21da
+--- <unnamed loop> (before)
++++ <unnamed loop> (after)
+@@ -1,24 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++   %5 = icmp slt i32 0, %3
++   br i1 %5, label %.lr.ph, label %16
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph:                                           ; preds = %4
++   br label %6
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = tail call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ 6:                                                ; preds = %.lr.ph, %6
++   %.08 = phi i32 [ 0, %.lr.ph ], [ %14, %6 ]
++   %7 = zext nneg i32 %.08 to i64
++   %8 = getelementptr inbounds float, ptr %1, i64 %7
++   %9 = load float, ptr %8, align 4
++   %10 = getelementptr inbounds float, ptr %2, i64 %7
++   %11 = load float, ptr %10, align 4
++   %12 = tail call float @llvm.fmuladd.f32(float %9, float 2.500000e+00, float %11)
++   %13 = getelementptr inbounds float, ptr %0, i64 %7
++   store float %12, ptr %13, align 4
++   %14 = add nuw nsw i32 %.08, 1
++   %15 = icmp slt i32 %14, %3
++   br i1 %15, label %6, label %._crit_edge, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %6
++   br label %16
++ 
++ 16:                                               ; preds = %._crit_edge, %4
+   ret void
+ }
+
+>>> Invocation #47: FunctionToLoopPassAdaptor on vector_add (function)
+    Hashes: 06f0c2a1bda70116 -> a88151c9020f21da
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,24 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++   %5 = icmp slt i32 0, %3
++   br i1 %5, label %.lr.ph, label %16
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph:                                           ; preds = %4
++   br label %6
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = tail call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ 6:                                                ; preds = %.lr.ph, %6
++   %.08 = phi i32 [ 0, %.lr.ph ], [ %14, %6 ]
++   %7 = zext nneg i32 %.08 to i64
++   %8 = getelementptr inbounds float, ptr %1, i64 %7
++   %9 = load float, ptr %8, align 4
++   %10 = getelementptr inbounds float, ptr %2, i64 %7
++   %11 = load float, ptr %10, align 4
++   %12 = tail call float @llvm.fmuladd.f32(float %9, float 2.500000e+00, float %11)
++   %13 = getelementptr inbounds float, ptr %0, i64 %7
++   store float %12, ptr %13, align 4
++   %14 = add nuw nsw i32 %.08, 1
++   %15 = icmp slt i32 %14, %3
++   br i1 %15, label %6, label %._crit_edge, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %6
++   br label %16
++ 
++ 16:                                               ; preds = %._crit_edge, %4
+   ret void
+ }
+
+>>> Invocation #58: SimplifyCFGPass on vector_add (function)
+    Hashes: a88151c9020f21da -> 5308192faea2c613
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,28 +1,22 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+   %5 = icmp slt i32 0, %3
+-   br i1 %5, label %.lr.ph, label %16
+- 
+- .lr.ph:                                           ; preds = %4
+-   br label %6
+- 
+- 6:                                                ; preds = %.lr.ph, %6
+-   %.08 = phi i32 [ 0, %.lr.ph ], [ %14, %6 ]
+-   %7 = zext nneg i32 %.08 to i64
+-   %8 = getelementptr inbounds float, ptr %1, i64 %7
+-   %9 = load float, ptr %8, align 4
+-   %10 = getelementptr inbounds float, ptr %2, i64 %7
+-   %11 = load float, ptr %10, align 4
+-   %12 = tail call float @llvm.fmuladd.f32(float %9, float 2.500000e+00, float %11)
+-   %13 = getelementptr inbounds float, ptr %0, i64 %7
+-   store float %12, ptr %13, align 4
+-   %14 = add nuw nsw i32 %.08, 1
+-   %15 = icmp slt i32 %14, %3
+-   br i1 %15, label %6, label %._crit_edge, !llvm.loop !6
++   br i1 %5, label %.lr.ph, label %._crit_edge
+  
+- ._crit_edge:                                      ; preds = %6
+-   br label %16
++ .lr.ph:                                           ; preds = %4, %.lr.ph
++   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %4 ]
++   %6 = zext nneg i32 %.08 to i64
++   %7 = getelementptr inbounds float, ptr %1, i64 %6
++   %8 = load float, ptr %7, align 4
++   %9 = getelementptr inbounds float, ptr %2, i64 %6
++   %10 = load float, ptr %9, align 4
++   %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
++   %12 = getelementptr inbounds float, ptr %0, i64 %6
++   store float %11, ptr %12, align 4
++   %13 = add nuw nsw i32 %.08, 1
++   %14 = icmp slt i32 %13, %3
++   br i1 %14, label %.lr.ph, label %._crit_edge, !llvm.loop !6
+  
+- 16:                                               ; preds = %._crit_edge, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+   ret void
+ }
+
+>>> Invocation #59: InstCombinePass on vector_add (function)
+    Hashes: 5308192faea2c613 -> 2656e4e26b317510
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,6 +1,6 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+-   %5 = icmp slt i32 0, %3
++   %5 = icmp sgt i32 %3, 0
+   br i1 %5, label %.lr.ph, label %._crit_edge
+ 
+ .lr.ph:                                           ; preds = %4, %.lr.ph
+
+>>> Invocation #62: LoopSimplifyPass on vector_add (function)
+    Hashes: 2656e4e26b317510 -> cd51ef605a010489
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,22 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+   %5 = icmp sgt i32 %3, 0
+-   br i1 %5, label %.lr.ph, label %._crit_edge
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- .lr.ph:                                           ; preds = %4, %.lr.ph
+-   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %4 ]
++ .lr.ph.preheader:                                 ; preds = %4
++   br label %.lr.ph
++ 
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %.lr.ph.preheader ]
+    %6 = zext nneg i32 %.08 to i64
+    %7 = getelementptr inbounds float, ptr %1, i64 %6
+    %8 = load float, ptr %7, align 4
+    %9 = getelementptr inbounds float, ptr %2, i64 %6
+    %10 = load float, ptr %9, align 4
+    %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
+    %12 = getelementptr inbounds float, ptr %0, i64 %6
+    store float %11, ptr %12, align 4
+    %13 = add nuw nsw i32 %.08, 1
+    %14 = icmp slt i32 %13, %3
+-   br i1 %14, label %.lr.ph, label %._crit_edge, !llvm.loop !6
++   br i1 %14, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #61: PassManager<Function> on vector_add (function)
+    Hashes: 2656e4e26b317510 -> cd51ef605a010489
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,22 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+   %5 = icmp sgt i32 %3, 0
+-   br i1 %5, label %.lr.ph, label %._crit_edge
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- .lr.ph:                                           ; preds = %4, %.lr.ph
+-   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %4 ]
++ .lr.ph.preheader:                                 ; preds = %4
++   br label %.lr.ph
++ 
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %.lr.ph.preheader ]
+    %6 = zext nneg i32 %.08 to i64
+    %7 = getelementptr inbounds float, ptr %1, i64 %6
+    %8 = load float, ptr %7, align 4
+    %9 = getelementptr inbounds float, ptr %2, i64 %6
+    %10 = load float, ptr %9, align 4
+    %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
+    %12 = getelementptr inbounds float, ptr %0, i64 %6
+    store float %11, ptr %12, align 4
+    %13 = add nuw nsw i32 %.08, 1
+    %14 = icmp slt i32 %13, %3
+-   br i1 %14, label %.lr.ph, label %._crit_edge, !llvm.loop !6
++   br i1 %14, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #66: IndVarSimplifyPass on .lr.ph (loop)
+    Hashes: cd51ef605a010489 -> 0a31c1a6d8b5b7d3
+--- .lr.ph (before)
++++ .lr.ph (after)
+@@ -4,21 +4,21 @@
+   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+ 
+ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext i32 %3 to i64
+    br label %.lr.ph
+  
+  .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+-   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %.lr.ph.preheader ]
+-   %6 = zext nneg i32 %.08 to i64
+-   %7 = getelementptr inbounds float, ptr %1, i64 %6
+-   %8 = load float, ptr %7, align 4
+-   %9 = getelementptr inbounds float, ptr %2, i64 %6
+-   %10 = load float, ptr %9, align 4
+-   %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
+-   %12 = getelementptr inbounds float, ptr %0, i64 %6
+-   store float %11, ptr %12, align 4
+-   %13 = add nuw nsw i32 %.08, 1
+-   %14 = icmp slt i32 %13, %3
+-   br i1 %14, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond = icmp ne i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
+ 
+ ._crit_edge.loopexit:                             ; preds = %.lr.ph
+   br label %._crit_edge
+
+>>> Invocation #64: PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &, LPMUpdater &> on .lr.ph (loop)
+    Hashes: cd51ef605a010489 -> 0a31c1a6d8b5b7d3
+--- .lr.ph (before)
++++ .lr.ph (after)
+@@ -4,21 +4,21 @@
+   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+ 
+ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext i32 %3 to i64
+    br label %.lr.ph
+  
+  .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+-   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %.lr.ph.preheader ]
+-   %6 = zext nneg i32 %.08 to i64
+-   %7 = getelementptr inbounds float, ptr %1, i64 %6
+-   %8 = load float, ptr %7, align 4
+-   %9 = getelementptr inbounds float, ptr %2, i64 %6
+-   %10 = load float, ptr %9, align 4
+-   %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
+-   %12 = getelementptr inbounds float, ptr %0, i64 %6
+-   store float %11, ptr %12, align 4
+-   %13 = add nuw nsw i32 %.08, 1
+-   %14 = icmp slt i32 %13, %3
+-   br i1 %14, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond = icmp ne i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
+ 
+ ._crit_edge.loopexit:                             ; preds = %.lr.ph
+   br label %._crit_edge
+
+>>> Invocation #60: FunctionToLoopPassAdaptor on vector_add (function)
+    Hashes: 2656e4e26b317510 -> 0a31c1a6d8b5b7d3
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,22 +1,28 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+   %5 = icmp sgt i32 %3, 0
+-   br i1 %5, label %.lr.ph, label %._crit_edge
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- .lr.ph:                                           ; preds = %4, %.lr.ph
+-   %.08 = phi i32 [ %13, %.lr.ph ], [ 0, %4 ]
+-   %6 = zext nneg i32 %.08 to i64
+-   %7 = getelementptr inbounds float, ptr %1, i64 %6
+-   %8 = load float, ptr %7, align 4
+-   %9 = getelementptr inbounds float, ptr %2, i64 %6
+-   %10 = load float, ptr %9, align 4
+-   %11 = tail call float @llvm.fmuladd.f32(float %8, float 2.500000e+00, float %10)
+-   %12 = getelementptr inbounds float, ptr %0, i64 %6
+-   store float %11, ptr %12, align 4
+-   %13 = add nuw nsw i32 %.08, 1
+-   %14 = icmp slt i32 %13, %3
+-   br i1 %14, label %.lr.ph, label %._crit_edge, !llvm.loop !6
++ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext i32 %3 to i64
++   br label %.lr.ph
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond = icmp ne i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
++ 
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #75: InstCombinePass on vector_add (function)
+    Hashes: 0a31c1a6d8b5b7d3 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -4,21 +4,21 @@
+   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+ 
+ .lr.ph.preheader:                                 ; preds = %4
+-   %wide.trip.count = zext i32 %3 to i64
++   %wide.trip.count = zext nneg i32 %3 to i64
+    br label %.lr.ph
+  
+  .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+    %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
+    %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+    %7 = load float, ptr %6, align 4
+    %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+    %9 = load float, ptr %8, align 4
+    %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
+    %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+    store float %10, ptr %11, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+-   %exitcond = icmp ne i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond, label %.lr.ph, label %._crit_edge.loopexit, !llvm.loop !6
++   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+ 
+ ._crit_edge.loopexit:                             ; preds = %.lr.ph
+   br label %._crit_edge
+
+>>> Invocation #76: JumpThreadingPass on vector_add (function)
+    Hashes: ab52ec7d30d416aa -> 46bf7662d35b14a7
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,11 +18,8 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+- 
+- ._crit_edge.loopexit:                             ; preds = %.lr.ph
+-   br label %._crit_edge
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+   ret void
+ }
+
+>>> Invocation #84: LoopSimplifyPass on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #83: PassManager<Function> on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #82: FunctionToLoopPassAdaptor on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #88: SimplifyCFGPass on vector_add (function)
+    Hashes: ab52ec7d30d416aa -> 46bf7662d35b14a7
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,11 +18,8 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+- 
+- ._crit_edge.loopexit:                             ; preds = %.lr.ph
+-   br label %._crit_edge
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+   ret void
+ }
+
+>>> Invocation #33: PassManager<Function> on vector_add (function)
+    Hashes: 06f0c2a1bda70116 -> 46bf7662d35b14a7
+--- vector_add (before)
++++ vector_add (after)
+@@ -1,24 +1,25 @@
+ ; Function Attrs: noinline nounwind uwtable
+ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++   %5 = icmp sgt i32 %3, 0
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext nneg i32 %3 to i64
++   br label %.lr.ph
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+   ret void
+ }
+
+>>> Invocation #26: ModuleToPostOrderCGSCCPassAdaptor on /tmp/vec.ll (module)
+    Hashes: 06f0c2a1bda70116 -> 46bf7662d35b14a7
+--- /tmp/vec.ll (before)
++++ /tmp/vec.ll (after)
+@@ -3,35 +3,36 @@
+ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+ target triple = "x86_64-pc-linux-gnu"
+ 
+- ; Function Attrs: noinline nounwind uwtable
+- define dso_local void @vector_add(ptr noalias noundef %0, ptr noalias noundef %1, ptr noalias noundef %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++ ; Function Attrs: nofree noinline norecurse nosync nounwind memory(argmem: readwrite) uwtable
++ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
++   %5 = icmp sgt i32 %3, 0
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext nneg i32 %3 to i64
++   br label %.lr.ph
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+  declare float @llvm.fmuladd.f32(float, float, float) #1
+  
+- attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
++ attributes #0 = { nofree noinline norecurse nosync nounwind memory(argmem: readwrite) uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+ attributes #1 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+ 
+ !llvm.module.flags = !{!0, !1, !2, !3, !4}
+
+>>> Invocation #21: ModuleInlinerWrapperPass on /tmp/vec.ll (module)
+    Hashes: 06f0c2a1bda70116 -> 46bf7662d35b14a7
+--- /tmp/vec.ll (before)
++++ /tmp/vec.ll (after)
+@@ -3,35 +3,36 @@
+ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+ target triple = "x86_64-pc-linux-gnu"
+ 
+- ; Function Attrs: noinline nounwind uwtable
+- define dso_local void @vector_add(ptr noalias noundef %0, ptr noalias noundef %1, ptr noalias noundef %2, i32 noundef %3) local_unnamed_addr #0 {
+-   br label %5
++ ; Function Attrs: nofree noinline norecurse nosync nounwind memory(argmem: readwrite) uwtable
++ define dso_local void @vector_add(ptr noalias nocapture noundef writeonly %0, ptr noalias nocapture noundef readonly %1, ptr noalias nocapture noundef readonly %2, i32 noundef %3) local_unnamed_addr #0 {
++   %5 = icmp sgt i32 %3, 0
++   br i1 %5, label %.lr.ph.preheader, label %._crit_edge
+  
+- 5:                                                ; preds = %7, %4
+-   %.0 = phi i32 [ 0, %4 ], [ %15, %7 ]
+-   %6 = icmp slt i32 %.0, %3
+-   br i1 %6, label %7, label %16
++ .lr.ph.preheader:                                 ; preds = %4
++   %wide.trip.count = zext nneg i32 %3 to i64
++   br label %.lr.ph
+  
+- 7:                                                ; preds = %5
+-   %8 = zext nneg i32 %.0 to i64
+-   %9 = getelementptr inbounds float, ptr %1, i64 %8
+-   %10 = load float, ptr %9, align 4
+-   %11 = getelementptr inbounds float, ptr %2, i64 %8
+-   %12 = load float, ptr %11, align 4
+-   %13 = call float @llvm.fmuladd.f32(float %10, float 2.500000e+00, float %12)
+-   %14 = getelementptr inbounds float, ptr %0, i64 %8
+-   store float %13, ptr %14, align 4
+-   %15 = add nuw nsw i32 %.0, 1
+-   br label %5, !llvm.loop !6
++ .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
++   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %7 = load float, ptr %6, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %9 = load float, ptr %8, align 4
++   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
++   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %10, ptr %11, align 4
++   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
++   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
+  
+- 16:                                               ; preds = %5
++ ._crit_edge:                                      ; preds = %.lr.ph, %4
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+  declare float @llvm.fmuladd.f32(float, float, float) #1
+  
+- attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
++ attributes #0 = { nofree noinline norecurse nosync nounwind memory(argmem: readwrite) uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+ attributes #1 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+ 
+ !llvm.module.flags = !{!0, !1, !2, !3, !4}
+
+>>> Invocation #109: LoopSimplifyPass on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #108: PassManager<Function> on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #107: FunctionToLoopPassAdaptor on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> ab52ec7d30d416aa
+--- vector_add (before)
++++ vector_add (after)
+@@ -18,8 +18,11 @@
+   store float %10, ptr %11, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+   ret void
+ }
+
+>>> Invocation #116: LoopVectorizePass on vector_add (function)
+    Hashes: ab52ec7d30d416aa -> 99dd13d1b2178907
+--- vector_add (before)
++++ vector_add (after)
+@@ -5,22 +5,64 @@
+ 
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
++   %min.iters.check = icmp ult i64 %wide.trip.count, 8
++   br i1 %min.iters.check, label %scalar.ph, label %vector.ph
++ 
++ vector.ph:                                        ; preds = %.lr.ph.preheader
++   %n.mod.vf = urem i64 %wide.trip.count, 8
++   %n.vec = sub i64 %wide.trip.count, %n.mod.vf
++   br label %vector.body
++ 
++ vector.body:                                      ; preds = %vector.body, %vector.ph
++   %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
++   %6 = add i64 %index, 0
++   %7 = add i64 %index, 4
++   %8 = getelementptr inbounds float, ptr %1, i64 %6
++   %9 = getelementptr inbounds float, ptr %1, i64 %7
++   %10 = getelementptr inbounds float, ptr %8, i32 0
++   %11 = getelementptr inbounds float, ptr %8, i32 4
++   %wide.load = load <4 x float>, ptr %10, align 4
++   %wide.load10 = load <4 x float>, ptr %11, align 4
++   %12 = getelementptr inbounds float, ptr %2, i64 %6
++   %13 = getelementptr inbounds float, ptr %2, i64 %7
++   %14 = getelementptr inbounds float, ptr %12, i32 0
++   %15 = getelementptr inbounds float, ptr %12, i32 4
++   %wide.load11 = load <4 x float>, ptr %14, align 4
++   %wide.load12 = load <4 x float>, ptr %15, align 4
++   %16 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
++   %17 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
++   %18 = getelementptr inbounds float, ptr %0, i64 %6
++   %19 = getelementptr inbounds float, ptr %0, i64 %7
++   %20 = getelementptr inbounds float, ptr %18, i32 0
++   %21 = getelementptr inbounds float, ptr %18, i32 4
++   store <4 x float> %16, ptr %20, align 4
++   store <4 x float> %17, ptr %21, align 4
++   %index.next = add nuw i64 %index, 8
++   %22 = icmp eq i64 %index.next, %n.vec
++   br i1 %22, label %middle.block, label %vector.body, !llvm.loop !6
++ 
++ middle.block:                                     ; preds = %vector.body
++   %cmp.n = icmp eq i64 %wide.trip.count, %n.vec
++   br i1 %cmp.n, label %._crit_edge.loopexit, label %scalar.ph
++ 
++ scalar.ph:                                        ; preds = %.lr.ph.preheader, %middle.block
++   %bc.resume.val = phi i64 [ %n.vec, %middle.block ], [ 0, %.lr.ph.preheader ]
+    br label %.lr.ph
+  
+- .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+-   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
+-   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+-   %7 = load float, ptr %6, align 4
+-   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+-   %9 = load float, ptr %8, align 4
+-   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
+-   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+-   store float %10, ptr %11, align 4
++ .lr.ph:                                           ; preds = %scalar.ph, %.lr.ph
++   %indvars.iv = phi i64 [ %bc.resume.val, %scalar.ph ], [ %indvars.iv.next, %.lr.ph ]
++   %23 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %24 = load float, ptr %23, align 4
++   %25 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %26 = load float, ptr %25, align 4
++   %27 = tail call float @llvm.fmuladd.f32(float %24, float 2.500000e+00, float %26)
++   %28 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %27, ptr %28, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+    %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge.loopexit:                             ; preds = %.lr.ph
++ ._crit_edge.loopexit:                             ; preds = %middle.block, %.lr.ph
+   br label %._crit_edge
+ 
+ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+
+>>> Invocation #118: LoopLoadEliminationPass on vector_add (function)
+    Hashes: 99dd13d1b2178907 -> cd31aeb9da53edb0
+--- vector_add (before)
++++ vector_add (after)
+@@ -60,9 +60,12 @@
+   store float %27, ptr %28, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !10
++   br i1 %exitcond.not, label %._crit_edge.loopexit.loopexit, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge.loopexit:                             ; preds = %middle.block, %.lr.ph
++ ._crit_edge.loopexit.loopexit:                    ; preds = %.lr.ph
++   br label %._crit_edge.loopexit
++ 
++ ._crit_edge.loopexit:                             ; preds = %._crit_edge.loopexit.loopexit, %middle.block
+   br label %._crit_edge
+ 
+ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
+
+>>> Invocation #119: InstCombinePass on vector_add (function)
+    Hashes: cd31aeb9da53edb0 -> ae3034cdaebf2d20
+--- vector_add (before)
++++ vector_add (after)
+@@ -5,59 +5,50 @@
+ 
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
+-   %min.iters.check = icmp ult i64 %wide.trip.count, 8
++   %min.iters.check = icmp ult i32 %3, 8
+    br i1 %min.iters.check, label %scalar.ph, label %vector.ph
+  
+  vector.ph:                                        ; preds = %.lr.ph.preheader
+-   %n.mod.vf = urem i64 %wide.trip.count, 8
+-   %n.vec = sub i64 %wide.trip.count, %n.mod.vf
++   %n.vec = and i64 %wide.trip.count, 2147483640
+    br label %vector.body
+  
+  vector.body:                                      ; preds = %vector.body, %vector.ph
+    %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
+-   %6 = add i64 %index, 0
+-   %7 = add i64 %index, 4
+-   %8 = getelementptr inbounds float, ptr %1, i64 %6
+-   %9 = getelementptr inbounds float, ptr %1, i64 %7
+-   %10 = getelementptr inbounds float, ptr %8, i32 0
+-   %11 = getelementptr inbounds float, ptr %8, i32 4
+-   %wide.load = load <4 x float>, ptr %10, align 4
+-   %wide.load10 = load <4 x float>, ptr %11, align 4
+-   %12 = getelementptr inbounds float, ptr %2, i64 %6
+-   %13 = getelementptr inbounds float, ptr %2, i64 %7
+-   %14 = getelementptr inbounds float, ptr %12, i32 0
+-   %15 = getelementptr inbounds float, ptr %12, i32 4
+-   %wide.load11 = load <4 x float>, ptr %14, align 4
+-   %wide.load12 = load <4 x float>, ptr %15, align 4
+-   %16 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
+-   %17 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
+-   %18 = getelementptr inbounds float, ptr %0, i64 %6
+-   %19 = getelementptr inbounds float, ptr %0, i64 %7
+-   %20 = getelementptr inbounds float, ptr %18, i32 0
+-   %21 = getelementptr inbounds float, ptr %18, i32 4
+-   store <4 x float> %16, ptr %20, align 4
+-   store <4 x float> %17, ptr %21, align 4
++   %6 = getelementptr inbounds float, ptr %1, i64 %index
++   %7 = getelementptr inbounds float, ptr %6, i64 4
++   %wide.load = load <4 x float>, ptr %6, align 4
++   %wide.load10 = load <4 x float>, ptr %7, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %index
++   %9 = getelementptr inbounds float, ptr %8, i64 4
++   %wide.load11 = load <4 x float>, ptr %8, align 4
++   %wide.load12 = load <4 x float>, ptr %9, align 4
++   %10 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
++   %11 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
++   %12 = getelementptr inbounds float, ptr %0, i64 %index
++   %13 = getelementptr inbounds float, ptr %12, i64 4
++   store <4 x float> %10, ptr %12, align 4
++   store <4 x float> %11, ptr %13, align 4
+    %index.next = add nuw i64 %index, 8
+-   %22 = icmp eq i64 %index.next, %n.vec
+-   br i1 %22, label %middle.block, label %vector.body, !llvm.loop !6
++   %14 = icmp eq i64 %index.next, %n.vec
++   br i1 %14, label %middle.block, label %vector.body, !llvm.loop !6
+  
+  middle.block:                                     ; preds = %vector.body
+-   %cmp.n = icmp eq i64 %wide.trip.count, %n.vec
++   %cmp.n = icmp eq i64 %n.vec, %wide.trip.count
+    br i1 %cmp.n, label %._crit_edge.loopexit, label %scalar.ph
+  
+  scalar.ph:                                        ; preds = %.lr.ph.preheader, %middle.block
+    %bc.resume.val = phi i64 [ %n.vec, %middle.block ], [ 0, %.lr.ph.preheader ]
+    br label %.lr.ph
+  
+  .lr.ph:                                           ; preds = %scalar.ph, %.lr.ph
+    %indvars.iv = phi i64 [ %bc.resume.val, %scalar.ph ], [ %indvars.iv.next, %.lr.ph ]
+-   %23 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+-   %24 = load float, ptr %23, align 4
+-   %25 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+-   %26 = load float, ptr %25, align 4
+-   %27 = tail call float @llvm.fmuladd.f32(float %24, float 2.500000e+00, float %26)
+-   %28 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+-   store float %27, ptr %28, align 4
++   %15 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %16 = load float, ptr %15, align 4
++   %17 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %18 = load float, ptr %17, align 4
++   %19 = tail call float @llvm.fmuladd.f32(float %16, float 2.500000e+00, float %18)
++   %20 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %19, ptr %20, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+   br i1 %exitcond.not, label %._crit_edge.loopexit.loopexit, label %.lr.ph, !llvm.loop !10
+
+>>> Invocation #120: SimplifyCFGPass on vector_add (function)
+    Hashes: ae3034cdaebf2d20 -> 76d43142b034a457
+--- vector_add (before)
++++ vector_add (after)
+@@ -6,59 +6,49 @@
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
+   %min.iters.check = icmp ult i32 %3, 8
+-   br i1 %min.iters.check, label %scalar.ph, label %vector.ph
++   br i1 %min.iters.check, label %.lr.ph, label %vector.ph
+  
+  vector.ph:                                        ; preds = %.lr.ph.preheader
+    %n.vec = and i64 %wide.trip.count, 2147483640
+    br label %vector.body
+  
+  vector.body:                                      ; preds = %vector.body, %vector.ph
+    %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
+    %6 = getelementptr inbounds float, ptr %1, i64 %index
+    %7 = getelementptr inbounds float, ptr %6, i64 4
+    %wide.load = load <4 x float>, ptr %6, align 4
+    %wide.load10 = load <4 x float>, ptr %7, align 4
+    %8 = getelementptr inbounds float, ptr %2, i64 %index
+    %9 = getelementptr inbounds float, ptr %8, i64 4
+    %wide.load11 = load <4 x float>, ptr %8, align 4
+    %wide.load12 = load <4 x float>, ptr %9, align 4
+    %10 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
+    %11 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
+    %12 = getelementptr inbounds float, ptr %0, i64 %index
+    %13 = getelementptr inbounds float, ptr %12, i64 4
+    store <4 x float> %10, ptr %12, align 4
+    store <4 x float> %11, ptr %13, align 4
+    %index.next = add nuw i64 %index, 8
+    %14 = icmp eq i64 %index.next, %n.vec
+    br i1 %14, label %middle.block, label %vector.body, !llvm.loop !6
+  
+  middle.block:                                     ; preds = %vector.body
+    %cmp.n = icmp eq i64 %n.vec, %wide.trip.count
+-   br i1 %cmp.n, label %._crit_edge.loopexit, label %scalar.ph
+- 
+- scalar.ph:                                        ; preds = %.lr.ph.preheader, %middle.block
+-   %bc.resume.val = phi i64 [ %n.vec, %middle.block ], [ 0, %.lr.ph.preheader ]
+-   br label %.lr.ph
++   br i1 %cmp.n, label %._crit_edge, label %.lr.ph
+  
+- .lr.ph:                                           ; preds = %scalar.ph, %.lr.ph
+-   %indvars.iv = phi i64 [ %bc.resume.val, %scalar.ph ], [ %indvars.iv.next, %.lr.ph ]
++ .lr.ph:                                           ; preds = %middle.block, %.lr.ph.preheader, %.lr.ph
++   %indvars.iv = phi i64 [ %indvars.iv.next, %.lr.ph ], [ %n.vec, %middle.block ], [ 0, %.lr.ph.preheader ]
+    %15 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+    %16 = load float, ptr %15, align 4
+    %17 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+    %18 = load float, ptr %17, align 4
+    %19 = tail call float @llvm.fmuladd.f32(float %16, float 2.500000e+00, float %18)
+    %20 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+    store float %19, ptr %20, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+    %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit.loopexit, label %.lr.ph, !llvm.loop !10
+- 
+- ._crit_edge.loopexit.loopexit:                    ; preds = %.lr.ph
+-   br label %._crit_edge.loopexit
+- 
+- ._crit_edge.loopexit:                             ; preds = %._crit_edge.loopexit.loopexit, %middle.block
+-   br label %._crit_edge
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %4
++ ._crit_edge:                                      ; preds = %middle.block, %.lr.ph, %4
+   ret void
+ }
+
+>>> Invocation #124: LoopUnrollPass on vector_add (function)
+    Hashes: 76d43142b034a457 -> 74b9852fa7db9293
+--- vector_add (before)
++++ vector_add (after)
+@@ -6,49 +6,56 @@
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
+   %min.iters.check = icmp ult i32 %3, 8
+-   br i1 %min.iters.check, label %.lr.ph, label %vector.ph
++   br i1 %min.iters.check, label %.lr.ph.preheader13, label %vector.ph
+  
+  vector.ph:                                        ; preds = %.lr.ph.preheader
+    %n.vec = and i64 %wide.trip.count, 2147483640
+    br label %vector.body
+  
+  vector.body:                                      ; preds = %vector.body, %vector.ph
+    %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
+    %6 = getelementptr inbounds float, ptr %1, i64 %index
+    %7 = getelementptr inbounds float, ptr %6, i64 4
+    %wide.load = load <4 x float>, ptr %6, align 4
+    %wide.load10 = load <4 x float>, ptr %7, align 4
+    %8 = getelementptr inbounds float, ptr %2, i64 %index
+    %9 = getelementptr inbounds float, ptr %8, i64 4
+    %wide.load11 = load <4 x float>, ptr %8, align 4
+    %wide.load12 = load <4 x float>, ptr %9, align 4
+    %10 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
+    %11 = call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
+    %12 = getelementptr inbounds float, ptr %0, i64 %index
+    %13 = getelementptr inbounds float, ptr %12, i64 4
+    store <4 x float> %10, ptr %12, align 4
+    store <4 x float> %11, ptr %13, align 4
+    %index.next = add nuw i64 %index, 8
+    %14 = icmp eq i64 %index.next, %n.vec
+    br i1 %14, label %middle.block, label %vector.body, !llvm.loop !6
+  
+  middle.block:                                     ; preds = %vector.body
+    %cmp.n = icmp eq i64 %n.vec, %wide.trip.count
+-   br i1 %cmp.n, label %._crit_edge, label %.lr.ph
++   br i1 %cmp.n, label %._crit_edge, label %.lr.ph.preheader13
+  
+- .lr.ph:                                           ; preds = %middle.block, %.lr.ph.preheader, %.lr.ph
+-   %indvars.iv = phi i64 [ %indvars.iv.next, %.lr.ph ], [ %n.vec, %middle.block ], [ 0, %.lr.ph.preheader ]
++ .lr.ph.preheader13:                               ; preds = %.lr.ph.preheader, %middle.block
++   %indvars.iv.ph = phi i64 [ 0, %.lr.ph.preheader ], [ %n.vec, %middle.block ]
++   br label %.lr.ph
++ 
++ .lr.ph:                                           ; preds = %.lr.ph.preheader13, %.lr.ph
++   %indvars.iv = phi i64 [ %indvars.iv.next, %.lr.ph ], [ %indvars.iv.ph, %.lr.ph.preheader13 ]
+    %15 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+    %16 = load float, ptr %15, align 4
+    %17 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+    %18 = load float, ptr %17, align 4
+    %19 = tail call float @llvm.fmuladd.f32(float %16, float 2.500000e+00, float %18)
+    %20 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+    store float %19, ptr %20, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+    %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !10
++   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge:                                      ; preds = %middle.block, %.lr.ph, %4
++ ._crit_edge.loopexit:                             ; preds = %.lr.ph
++   br label %._crit_edge
++ 
++ ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %middle.block, %4
+   ret void
+ }
+
+>>> Invocation #140: SimplifyCFGPass on vector_add (function)
+    Hashes: 74b9852fa7db9293 -> f6ea38ad695b0c41
+--- vector_add (before)
++++ vector_add (after)
+@@ -51,11 +51,8 @@
+   store float %19, ptr %20, align 4
+   %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+   %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge.loopexit, label %.lr.ph, !llvm.loop !10
+- 
+- ._crit_edge.loopexit:                             ; preds = %.lr.ph
+-   br label %._crit_edge
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge:                                      ; preds = %._crit_edge.loopexit, %middle.block, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %middle.block, %4
+   ret void
+ }
+
+>>> Invocation #104: PassManager<Function> on vector_add (function)
+    Hashes: 46bf7662d35b14a7 -> f6ea38ad695b0c41
+--- vector_add (before)
++++ vector_add (after)
+@@ -5,21 +5,54 @@
+ 
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
++   %min.iters.check = icmp ult i32 %3, 8
++   br i1 %min.iters.check, label %.lr.ph.preheader13, label %vector.ph
++ 
++ vector.ph:                                        ; preds = %.lr.ph.preheader
++   %n.vec = and i64 %wide.trip.count, 2147483640
++   br label %vector.body
++ 
++ vector.body:                                      ; preds = %vector.body, %vector.ph
++   %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %index
++   %7 = getelementptr inbounds float, ptr %6, i64 4
++   %wide.load = load <4 x float>, ptr %6, align 4
++   %wide.load10 = load <4 x float>, ptr %7, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %index
++   %9 = getelementptr inbounds float, ptr %8, i64 4
++   %wide.load11 = load <4 x float>, ptr %8, align 4
++   %wide.load12 = load <4 x float>, ptr %9, align 4
++   %10 = tail call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
++   %11 = tail call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
++   %12 = getelementptr inbounds float, ptr %0, i64 %index
++   %13 = getelementptr inbounds float, ptr %12, i64 4
++   store <4 x float> %10, ptr %12, align 4
++   store <4 x float> %11, ptr %13, align 4
++   %index.next = add nuw i64 %index, 8
++   %14 = icmp eq i64 %index.next, %n.vec
++   br i1 %14, label %middle.block, label %vector.body, !llvm.loop !6
++ 
++ middle.block:                                     ; preds = %vector.body
++   %cmp.n = icmp eq i64 %n.vec, %wide.trip.count
++   br i1 %cmp.n, label %._crit_edge, label %.lr.ph.preheader13
++ 
++ .lr.ph.preheader13:                               ; preds = %.lr.ph.preheader, %middle.block
++   %indvars.iv.ph = phi i64 [ 0, %.lr.ph.preheader ], [ %n.vec, %middle.block ]
+    br label %.lr.ph
+  
+- .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+-   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
+-   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+-   %7 = load float, ptr %6, align 4
+-   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+-   %9 = load float, ptr %8, align 4
+-   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
+-   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+-   store float %10, ptr %11, align 4
++ .lr.ph:                                           ; preds = %.lr.ph.preheader13, %.lr.ph
++   %indvars.iv = phi i64 [ %indvars.iv.next, %.lr.ph ], [ %indvars.iv.ph, %.lr.ph.preheader13 ]
++   %15 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %16 = load float, ptr %15, align 4
++   %17 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %18 = load float, ptr %17, align 4
++   %19 = tail call float @llvm.fmuladd.f32(float %16, float 2.500000e+00, float %18)
++   %20 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %19, ptr %20, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+    %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %middle.block, %4
+   ret void
+ }
+
+>>> Invocation #103: ModuleToFunctionPassAdaptor on /tmp/vec.ll (module)
+    Hashes: 46bf7662d35b14a7 -> f6ea38ad695b0c41
+--- /tmp/vec.ll (before)
++++ /tmp/vec.ll (after)
+@@ -10,40 +10,79 @@
+ 
+ .lr.ph.preheader:                                 ; preds = %4
+   %wide.trip.count = zext nneg i32 %3 to i64
++   %min.iters.check = icmp ult i32 %3, 8
++   br i1 %min.iters.check, label %.lr.ph.preheader13, label %vector.ph
++ 
++ vector.ph:                                        ; preds = %.lr.ph.preheader
++   %n.vec = and i64 %wide.trip.count, 2147483640
++   br label %vector.body
++ 
++ vector.body:                                      ; preds = %vector.body, %vector.ph
++   %index = phi i64 [ 0, %vector.ph ], [ %index.next, %vector.body ]
++   %6 = getelementptr inbounds float, ptr %1, i64 %index
++   %7 = getelementptr inbounds float, ptr %6, i64 4
++   %wide.load = load <4 x float>, ptr %6, align 4
++   %wide.load10 = load <4 x float>, ptr %7, align 4
++   %8 = getelementptr inbounds float, ptr %2, i64 %index
++   %9 = getelementptr inbounds float, ptr %8, i64 4
++   %wide.load11 = load <4 x float>, ptr %8, align 4
++   %wide.load12 = load <4 x float>, ptr %9, align 4
++   %10 = tail call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load11)
++   %11 = tail call <4 x float> @llvm.fmuladd.v4f32(<4 x float> %wide.load10, <4 x float> <float 2.500000e+00, float 2.500000e+00, float 2.500000e+00, float 2.500000e+00>, <4 x float> %wide.load12)
++   %12 = getelementptr inbounds float, ptr %0, i64 %index
++   %13 = getelementptr inbounds float, ptr %12, i64 4
++   store <4 x float> %10, ptr %12, align 4
++   store <4 x float> %11, ptr %13, align 4
++   %index.next = add nuw i64 %index, 8
++   %14 = icmp eq i64 %index.next, %n.vec
++   br i1 %14, label %middle.block, label %vector.body, !llvm.loop !6
++ 
++ middle.block:                                     ; preds = %vector.body
++   %cmp.n = icmp eq i64 %n.vec, %wide.trip.count
++   br i1 %cmp.n, label %._crit_edge, label %.lr.ph.preheader13
++ 
++ .lr.ph.preheader13:                               ; preds = %.lr.ph.preheader, %middle.block
++   %indvars.iv.ph = phi i64 [ 0, %.lr.ph.preheader ], [ %n.vec, %middle.block ]
+    br label %.lr.ph
+  
+- .lr.ph:                                           ; preds = %.lr.ph.preheader, %.lr.ph
+-   %indvars.iv = phi i64 [ 0, %.lr.ph.preheader ], [ %indvars.iv.next, %.lr.ph ]
+-   %6 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
+-   %7 = load float, ptr %6, align 4
+-   %8 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
+-   %9 = load float, ptr %8, align 4
+-   %10 = tail call float @llvm.fmuladd.f32(float %7, float 2.500000e+00, float %9)
+-   %11 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
+-   store float %10, ptr %11, align 4
++ .lr.ph:                                           ; preds = %.lr.ph.preheader13, %.lr.ph
++   %indvars.iv = phi i64 [ %indvars.iv.next, %.lr.ph ], [ %indvars.iv.ph, %.lr.ph.preheader13 ]
++   %15 = getelementptr inbounds float, ptr %1, i64 %indvars.iv
++   %16 = load float, ptr %15, align 4
++   %17 = getelementptr inbounds float, ptr %2, i64 %indvars.iv
++   %18 = load float, ptr %17, align 4
++   %19 = tail call float @llvm.fmuladd.f32(float %16, float 2.500000e+00, float %18)
++   %20 = getelementptr inbounds float, ptr %0, i64 %indvars.iv
++   store float %19, ptr %20, align 4
+    %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1
+    %exitcond.not = icmp eq i64 %indvars.iv.next, %wide.trip.count
+-   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !6
++   br i1 %exitcond.not, label %._crit_edge, label %.lr.ph, !llvm.loop !10
+  
+- ._crit_edge:                                      ; preds = %.lr.ph, %4
++ ._crit_edge:                                      ; preds = %.lr.ph, %middle.block, %4
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+  declare float @llvm.fmuladd.f32(float, float, float) #1
++ 
++ ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
++ declare <4 x float> @llvm.fmuladd.v4f32(<4 x float>, <4 x float>, <4 x float>) #2
+  
+  attributes #0 = { nofree noinline norecurse nosync nounwind memory(argmem: readwrite) uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+  attributes #1 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
++ attributes #2 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+  
+  !llvm.module.flags = !{!0, !1, !2, !3, !4}
+  !llvm.ident = !{!5}
+  
+  !0 = !{i32 1, !"wchar_size", i32 4}
+  !1 = !{i32 8, !"PIC Level", i32 2}
+  !2 = !{i32 7, !"PIE Level", i32 2}
+  !3 = !{i32 7, !"uwtable", i32 2}
+  !4 = !{i32 7, !"frame-pointer", i32 2}
+  !5 = !{!"Ubuntu clang version 18.1.3 (1ubuntu1)"}
+- !6 = distinct !{!6, !7, !8}
++ !6 = distinct !{!6, !7, !8, !9}
+  !7 = !{!"llvm.loop.mustprogress"}
+- !8 = !{!"llvm.loop.vectorize.enable", i1 true}
++ !8 = !{!"llvm.loop.isvectorized", i32 1}
++ !9 = !{!"llvm.loop.unroll.runtime.disable"}
++ !10 = distinct !{!10, !7, !9, !8}
+
+================================================================================
+                           END OF VERNIER REPORT                                
+================================================================================
