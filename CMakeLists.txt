@@ -68,4 +68,29 @@ endif()
 
 set_target_properties(vernier PROPERTIES PREFIX "")
 
+# Companion CLI tool
+add_executable(vernier-tool
+  tools/vernier-tool/main.cpp
+  tools/vernier-tool/ablate.cpp
+)
+
+target_include_directories(vernier-tool SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(vernier-tool PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include tools/vernier-tool)
+target_compile_definitions(vernier-tool PRIVATE ${LLVM_DEFS})
+target_link_libraries(vernier-tool PRIVATE ${LLVM_LIBS})
+
+target_compile_options(vernier-tool PRIVATE
+  -Wall
+  -Wextra
+  -Wpedantic
+)
+
+if(NOT LLVM_ENABLE_RTTI)
+  target_compile_options(vernier-tool PRIVATE -fno-rtti)
+endif()
+
+if(NOT LLVM_ENABLE_EH)
+  target_compile_options(vernier-tool PRIVATE -fno-exceptions)
+endif()
+
 enable_testing()
