@@ -13,6 +13,7 @@ Makefile
 *.so
 *.a
 *.dylib
+!examples/custom_pass/*.so
 
 # Compiler IR and intermediate output
 *.ll

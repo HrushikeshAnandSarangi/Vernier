@@ -202,6 +202,43 @@ ctest --test-dir build --output-on-failure
 
 ---
 
+## Tradeoffs
+
+Building an out-of-tree pass-manager instrumentation plugin requires balancing non-invasive measurement, accuracy, and compiler performance:
+
+1. **Change Detection: Before/After Structural Hashing vs. Compiler Time**
+   - *Tradeoff*: Absolute ground truth vs. compile-time slowdown.
+   - *Decision*: Compute `llvm::StructuralHash` for every IR unit (and combine function hashes for modules/SCCs) before and after **every** pass invocation.
+   - *Why not trust `PreservedAnalyses`?*: LLVM passes routinely "under-report"—conservatively claiming analyses are invalidated even when zero instructions were modified, or claiming `PreservedAnalyses::all()` while making subtle metadata edits.
+   - *Cost*: Structural hashing adds compile-time overhead on multi-function units, but guarantees 100% ground truth without false positive mutations or silent transformations.
+
+2. **Zero-Perturbation Principle: Cached Analyses vs. Complete TTI/BFI**
+   - *Tradeoff*: Non-intrusive profiling vs. guaranteed cost metrics.
+   - *Decision*: Capture `ModuleAnalysisManager*` at pipeline start, but strictly query `getCachedResult<BlockFrequencyAnalysis>` and `getCachedResult<TargetIRAnalysis>`. Vernier **never** invokes `getResult()`.
+   - *Why?*: Forcing computation of BFI or TTI would alter the pipeline's analysis cache, potentially modifying subsequent optimization decisions or masking real compiler bugs. If an analysis has not been cached yet, Vernier falls back to structural metrics (instruction count, basic blocks, memory loads/stores).
+
+3. **Unified Diffs: Windowed LCS vs. Output Explosion**
+   - *Tradeoff*: Diff compute time vs. storage and readability.
+   - *Decision*: Rather than diffing entire functions or modules line-by-line (like LLVM's `-print-changed=diff`), Vernier trims common leading and trailing lines first, runs LCS strictly on the modified inner window with configurable context, and enforces a maximum diff threshold (`Opts.MaxDiffLines`) with a concise fallback summary.
+   - *Consequence*: Diffing is executed lazily only on mutating passes, preventing megabytes of redundant IR text from bloating reports on large translation units.
+
+4. **IR Snapshots: Content-Addressed Store (CAS) vs. Memory Footprint**
+   - *Tradeoff*: Disk I/O vs. RAM exhaustion.
+   - *Decision*: Implement a Git-style content-addressed store (`.store/objects/<hash>.ll`). Each unique function body is stored once keyed by its hash, and invocations store references to hash pointers.
+   - *Consequence*: Massively deduplicates identical function states across hundreds of no-op passes, avoiding in-memory trace explosion at the cost of disk I/O when tracking tens of thousands of passes.
+
+5. **Remark Attribution: Custom `DiagnosticHandler` vs. Remark Output Files**
+   - *Tradeoff*: In-process frame correlation vs. compatibility with `opt` flags.
+   - *Decision*: Install a custom `DiagnosticHandler` on `LLVMContext` to intercept missed-optimization remarks in real time and attribute them directly to the top frame of Vernier's active thread-local stack.
+   - *Consequence*: Because LLVM only supports one active diagnostic handler per context, enabling `-vn-remarks` overrides `opt`'s default diagnostic printer and `-pass-remarks-output` YAML emission.
+
+6. **Two-Tier Architecture: Plugin (`vernier.so`) vs. CLI Driver (`vernier-tool`)**
+   - *Tradeoff*: In-process simplicity vs. out-of-process capability.
+   - *Decision*: Separate in-process telemetry capture (`vernier.so`) from post-processing and analysis (`vernier-tool`).
+   - *Why?*: A compiler pass plugin cannot cleanly re-invoke `clang` to compile candidate binaries with disabled passes while the primary compilation is in flight. Moving pass ablation (`ablate`), Needleman-Wunsch sequence alignment (`compare`), and human-readable formatting (`report`) out-of-process keeps the compiler plugin lightweight, isolated, and crash-resilient.
+
+---
+
 ## Repository Layout
 
 ```
