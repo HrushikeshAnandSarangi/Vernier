@@ -95,6 +95,9 @@ if(NOT LLVM_ENABLE_EH)
   target_compile_options(vernier-tool PRIVATE -fno-exceptions)
 endif()
 
+# Example custom pass plugin
+add_subdirectory(examples/custom_pass)
+
 enable_testing()
 
 # Unit test: Diffing
